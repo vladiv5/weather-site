@@ -1,0 +1,38 @@
+:root {
+    --color-primary: #1a73e8;
+    --color-secondary: #ffcc00;
+    --color-background: #1b1b1cb4;
+    --color-text: #ffffff;
+    --color-subtext: #5e575700;
+    --body: #1b1b1c;
+}
+
+#root {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: var(--color-background);
+    color: var(--color-text);
+    margin: 0;
+    padding: 0;
+    text-align: center;
+}
+
+
+header {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.subtext {
+    color: var(--status-bg);
+    font-weight: 600;
+    font-size: 1rem;
+    text-align: center;
+}
+  
+

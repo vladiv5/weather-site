@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Weather Viewer Application</title>
+    <link rel="stylesheet" href="styles/city_weather.css">
+    <link rel="stylesheet" href="styles/weather_cards.css">
+    <link rel="stylesheet" href="styles/global.css">
+    <link rel="stylesheet" href="styles/spinner.css">
+    <script src="scripts/spinner.js" defer></script>
+    <script src="scripts/city_weather.js" defer></script>
+    <script src="scripts/weather_cards.js" defer></script>
+</head>
+<body>
+    <div id="root">
+        <header>
+            <h1>Weather Viewer</h1>
+        </header>
+        <main>
+            <h2 class="subtitle">Forecast for the next 5 days</h2>
+            <div class="content-container">
+                <div id="forecast-card" class="hidden"></div>
+                <div id="current-weather-card" class="hidden"></div>
+            </div>
+        </main>
+    </div>
+    <div hidden id="spinner"></div>
+</body>
+</html>

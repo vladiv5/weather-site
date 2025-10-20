@@ -1,77 +1,97 @@
 <!DOCTYPE html>
-<html>
-<head>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Weather Viewer Application</title>
-    <link rel="stylesheet" href="styles/index.css">
-    <link rel="stylesheet" href="styles/weather_cards.css">
-    <link rel="stylesheet" href="styles/global.css">
-    <link rel="stylesheet" href="styles/spinner.css">
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="styles/global.css" />
+    <link rel="stylesheet" href="styles/index.css" />
+    <link rel="stylesheet" href="styles/weather_cards.css" />
+    <link rel="stylesheet" href="styles/spinner.css" />
+
+    <!-- Scripts -->
     <script src="scripts/spinner.js" defer></script>
     <script src="scripts/index.js" defer></script>
     <script src="scripts/weather_cards.js" defer></script>
-</head>
-<body>
+  </head>
+
+  <body>
     <div id="root">
-        <header>
-            <h1>Weather Viewer</h1>
-        </header>
-        <ul class="grid-container">
-            <li class="grid-item">
-              <div class="card card-night">
-                <div class="night"></div>
-              </div>
-              <div class="status">
-                <p class="cardtitle"></p>
-                <p class="subtext"></p>
-              </div>
-            </li>
-            <li class="grid-item">
-              <div class="card card-rain">
-                <div class="rain"></div>
-              </div>
-              <div class="status">
-                <p class="cardtitle"></p>
-                <p class="subtext"></p>
-              </div>
-            </li>
-            <li class="grid-item">
-              <div class="card card-snow">
-                <div class="snow"></div>
-              </div>
-              <div class="status">
-                <p class="cardtitle"></p>
-                <p class="subtext"></p>
-              </div>
-            </li>
-            <li class="grid-item">
-              <div class="card card-storm">
-                <div class="storm"></div>
-              </div>
-              <div class="status">
-                <p class="cardtitle"></p>
-                <p class="subtext"></p>
-              </div>
-            </li>
-            <li class="grid-item">
-              <div class="card card-sunny">
-                <div class="sunny"></div>
-              </div>
-              <div class="status">
-                <p class="cardtitle"></p>
-                <p class="subtext"></p>
-              </div>
-            </li>
-          </ul>
-        <main>
-            <div class="search-container">
-                <input type="text" id="autocomplete" placeholder="Search for a city">
-                <ul id="results"></ul>
-                <ul id="favorites" class="hidden"></ul>
-            </div>
-            <div id="weather-card" class="hidden">
-            </div>
-        </main>
+      <header>
+        <h1>Weather Viewer</h1>
+      </header>
+
+      <!-- Weather category cards -->
+      <ul class="grid-container">
+        <li class="grid-item">
+          <div class="card card-night">
+            <div class="night"></div>
+          </div>
+          <div class="status">
+            <p class="cardtitle"></p>
+            <p class="subtext"></p>
+          </div>
+        </li>
+
+        <li class="grid-item">
+          <div class="card card-rain">
+            <div class="rain"></div>
+          </div>
+          <div class="status">
+            <p class="cardtitle"></p>
+            <p class="subtext"></p>
+          </div>
+        </li>
+
+        <li class="grid-item">
+          <div class="card card-snow">
+            <div class="snow"></div>
+          </div>
+          <div class="status">
+            <p class="cardtitle"></p>
+            <p class="subtext"></p>
+          </div>
+        </li>
+
+        <li class="grid-item">
+          <div class="card card-storm">
+            <div class="storm"></div>
+          </div>
+          <div class="status">
+            <p class="cardtitle"></p>
+            <p class="subtext"></p>
+          </div>
+        </li>
+
+        <li class="grid-item">
+          <div class="card card-sunny">
+            <div class="sunny"></div>
+          </div>
+          <div class="status">
+            <p class="cardtitle"></p>
+            <p class="subtext"></p>
+          </div>
+        </li>
+      </ul>
+
+      <main>
+        <div class="search-container">
+          <input
+            type="text"
+            id="autocomplete"
+            placeholder="Search for a city"
+            aria-label="Search for a city"
+          />
+          <ul id="results"></ul>
+          <ul id="favorites" class="hidden"></ul>
+        </div>
+
+        <section id="weather-card" class="hidden"></section>
+      </main>
     </div>
-    <div hidden id="spinner"></div>
-</body>
+
+    <div id="spinner" hidden></div>
+  </body>
 </html>

@@ -5,7 +5,7 @@
 }
 
 #forecast-card {
-    background-color: #3c3b3d;
+    background-color: var(--color-card-forecast);
     padding: 20px;
     border-radius: 8px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
@@ -16,22 +16,23 @@
 #forecast-card table {
     width: 100%;
     border-collapse: collapse;
-    color: #ffffff;
+    color: var(--color-text-forecast);
     text-align: center;
 }
 
-#forecast-card th, #forecast-card td {
-    border: 1px solid #ccc;
+#forecast-card th,
+#forecast-card td {
+    border: 1px solid var(--color-border-forecast);
     padding: 8px;
     text-align: center;
 }
 
 #forecast-card th {
-    background-color: #484848;
+    background-color: var(--color-card-forecast);
 }
 
 #current-weather-card {
-    background-color: #3c3b3d;
+    background-color: var(--color-card-forecast);
     padding: 20px;
     border-radius: 8px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
@@ -42,12 +43,11 @@
 .subtitle {
     font-weight: 600;
     font-size: 1.4rem;
-    color: #000000;
+    color: var(--color-subtitle);
     text-align: center;
     text-transform: uppercase;
     letter-spacing: 0.1em;
 }
-
 
 .status {
     margin-top: 100px !important;
@@ -64,18 +64,6 @@
     justify-content: center;
 }
 
-.sunny{
-    left:141px !important;
-}
-
-.night{
-    left: 220px !important;
-}
-
-.rain, .snow, .storm{
-    left: 120px !important;
-}
-
-.hidden {
-    display: none;
-}
+.sunny { left: 141px !important; }
+.night { left: 220px !important; }
+.rain, .snow, .storm { left: 120px !important; }

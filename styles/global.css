@@ -1,10 +1,28 @@
+/* === ROOT VARIABLES === */
 :root {
-    --color-primary: #1a73e8;
-    --color-secondary: #ffcc00;
-    --color-background: #1b1b1cb4;
-    --color-text: #ffffff;
-    --color-subtext: #5e575700;
-    --body: #1b1b1c;
+    --color-primary: #01161E;          /* culoare accent, pentru butoane, hover, titluri */
+    --color-secondary: #AEC3B0;        /* culoare complementară, pentru highlights, butoane secundare */
+    --color-background: #EFF6E0;       /* fundal general, mai luminos decât alb complet, mai moale pentru ochi */
+    --color-card: #598392;             /* fundal card, puțin mai deschis decât primary */
+    --color-card-forecast: #598392;    /* fundal card prognoză, nuanță complementară, păstrează contrast */
+    --color-text: #EFF6E0;             /* text general, foarte ușor mai întunecat decât primary pentru lizibilitate */
+    --color-text-forecast: #ffffff;    /* text pe carduri forecast, alb pentru contrast */
+    --color-subtext: #EFF6E0;          /* text secundar, subtitluri */
+    --color-subtitle: #ffffff;         /* subtitluri pe carduri întunecate */
+    --color-border: #124559;           /* border card, mai subtil decât primary */
+    --color-border-forecast: #124559;  /* border card forecast, păstrează contrast */
+    --transition-fast: 0.2s ease;
+}
+
+
+/* === GLOBAL LAYOUT === */
+body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background-color: var(--color-background);
+    color: var(--color-text);
+    margin: 0;
+    padding: 0;
+    text-align: center;
 }
 
 #root {
@@ -13,26 +31,28 @@
     padding: 20px;
 }
 
-body {
-    font-family: Arial, sans-serif;
-    background-color: var(--color-background);
-    color: var(--color-text);
-    margin: 0;
-    padding: 0;
-    text-align: center;
-}
-
-
+/* === HEADER === */
 header {
     text-align: center;
-    margin-bottom: 20px;
+    margin-bottom: 30px;
 }
 
+header h1 {
+    color: var(--color-primary);
+    font-size: 2.5rem;
+    letter-spacing: 1px;
+    margin: 0;
+}
+
+/* === TEXT STYLES === */
 .subtext {
-    color: var(--status-bg);
-    font-weight: 600;
+    color: var(--color-subtext);
+    font-weight: 500;
     font-size: 1rem;
     text-align: center;
 }
-  
 
+/* === UTILITY CLASSES === */
+.hidden {
+    display: none !important;
+}

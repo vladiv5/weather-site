@@ -1,92 +1,111 @@
+/* === SEARCH CONTAINER === */
 .search-container {
     display: flex;
     flex-direction: column;
     align-items: center;
 }
 
+/* === AUTOCOMPLETE INPUT === */
 #autocomplete {
     width: 100%;
+    max-width: 500px;
     padding: 10px;
     font-size: 16px;
     margin-bottom: 10px;
+    border: 1px solid var(--color-border);
+    border-radius: 4px;
+    background-color: var(--color-card);
+    color: var(--color-text);
 }
 
 #autocomplete::placeholder {
     text-align: center;
+    color: var(--color-subtext);
 }
 
-#results, #favorites {
-    list-style-type: none;
-    color: #000000;
+/* === RESULTS & FAVORITES LIST === */
+#results,
+#favorites {
+    list-style: none;
+    color: var(--color-text);
     padding: 0;
     width: 100%;
+    max-width: 500px;
     max-height: 200px;
     overflow-y: auto;
-    background-color: #fff;
-    border: 1px solid #ccc;
-    border-radius: 4px;
+    background-color: var(--color-card);
+    border: 1px solid var(--color-border);
+    border-radius: 6px;
     margin-top: 10px;
 }
 
-#results li, #favorites li {
+#results li,
+#favorites li {
     padding: 10px;
-    cursor: pointer;
     display: flex;
     justify-content: space-between;
     align-items: center;
+    cursor: pointer;
+    transition: background-color var(--transition-fast);
 }
 
-#results li:hover, #favorites li:hover {
-    background-color: #f0f0f0;
+#results li:hover,
+#favorites li:hover {
+    background-color: var(--color-primary);
+    color: var(--color-text);
 }
 
+/* === WEATHER CARD === */
 #weather-card {
-    background-color: #3c3b3d;
+    background-color: var(--color-card);
     padding: 20px;
     border-radius: 8px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    margin-top: 20px;
-    width: 50%;
-    margin-left: auto;
-    margin-right: auto;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    margin: 30px auto;
+    width: 90%;
+    max-width: 600px;
+    color: var(--color-text);
 }
 
 #weather-card table {
     width: 100%;
     border-collapse: collapse;
-    color: #ffffff;
     text-align: center;
 }
 
-#weather-card th, #weather-card td {
-    border: 1px solid #ccc;
+#weather-card th,
+#weather-card td {
+    border: 1px solid var(--color-border);
     padding: 8px;
-    background-color: #484848;
-    text-align: center;
+    background-color: var(--color-card);
 }
 
+/* === FORECAST BUTTON === */
 #forecast-button {
     margin-top: 20px;
     padding: 10px 20px;
-    background-color: var(--color-background);
-    color: #ffffff;
+    background-color: var(--color-primary);
+    color: var(--color-text);
     border: none;
     border-radius: 4px;
     cursor: pointer;
+    transition: background-color var(--transition-fast);
 }
 
 #forecast-button:hover {
     background-color: var(--color-secondary);
 }
 
-.hidden {
-    display: none;
-}
-
+/* === HEART BUTTON === */
 .heart-button {
     background: none;
     border: none;
     color: red;
-    font-size: 1.5rem;
+    font-size: 1.3rem;
     cursor: pointer;
+    transition: transform var(--transition-fast);
+}
+
+.heart-button:hover {
+    transform: scale(1.2);
 }

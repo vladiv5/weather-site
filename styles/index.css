@@ -109,3 +109,12 @@
 .heart-button:hover {
     transform: scale(1.2);
 }
+
+#favorites-title {
+    margin-top: 20px;
+    margin-bottom: 10px;
+    font-size: 1.2rem;
+    color: var(--color-primary);
+    text-align: left;
+  }
+  

@@ -11,34 +11,44 @@ document.addEventListener("DOMContentLoaded", () => {
     const API_KEY = "1ed72901fef34a7da48182141250901";
     let selectedCity = "";
     let favorites = JSON.parse(localStorage.getItem("favorites")) || [];
+    let resultsVisible = false;
   
     // ===== Event Listeners =====
   
-    // Autocomplete input handler
+    // Input handler pentru autocomplete
     autocomplete.addEventListener("input", () => {
       const query = autocomplete.value.trim();
       resultsList.innerHTML = "";
   
       if (query.length > 2) {
         fetchCities(query);
+        resultsVisible = true;
+        resultsList.classList.remove("hidden");
       } else if (query.length === 0) {
-        displayFavorites();
+        resultsVisible = false;
+        resultsList.classList.add("hidden");
       }
     });
   
-    // Show favorites when input focused
+    // Focus pe search bar
     autocomplete.addEventListener("focus", () => {
-      if (autocomplete.value === "") displayFavorites();
+      if (autocomplete.value.trim().length > 2 && resultsList.children.length > 0) {
+        resultsList.classList.remove("hidden");
+      }
     });
   
-    // Hide dropdowns on blur (with delay to allow clicks)
-    autocomplete.addEventListener("blur", () => {
-      setTimeout(() => favoritesList.classList.add("hidden"), 200);
+    // Click în afara search bar-ului => ascunde lista cu sugestii
+    document.addEventListener("click", (event) => {
+      const isClickInsideSearch =
+        autocomplete.contains(event.target) || resultsList.contains(event.target);
+  
+      if (!isClickInsideSearch) {
+        resultsList.classList.add("hidden");
+      }
     });
   
     // ===== API Fetching =====
   
-    // Fetch city autocomplete results
     async function fetchCities(query) {
       const url = `https://api.weatherapi.com/v1/search.json?key=${API_KEY}&q=${query}`;
   
@@ -46,54 +56,53 @@ document.addEventListener("DOMContentLoaded", () => {
         const response = await fetch(url);
         const data = await response.json();
   
-        if (!Array.isArray(data)) {
-          resultsList.innerHTML = "<li>No cities found.</li>";
-          return;
-        }
-  
-        const filtered = data.filter(city =>
-          city.name.toLowerCase().startsWith(query.toLowerCase())
-        );
-  
-        if (filtered.length === 0) {
+        if (!Array.isArray(data) || data.length === 0) {
           resultsList.innerHTML = "<li>No cities found.</li>";
           return;
         }
   
         resultsList.innerHTML = "";
-        filtered.forEach(city => {
+        data.forEach(city => {
           const li = document.createElement("li");
-          li.textContent = `${city.name}, ${city.region}, ${city.country}`;
+          li.style.display = "flex";
+          li.style.justifyContent = "space-between";
+          li.style.alignItems = "center";
+          li.style.padding = "8px";
+          li.style.cursor = "pointer";
   
-          // Add favorite button
-          const heart = document.createElement("button");
-          heart.className = "heart-button";
-          heart.innerHTML = "&#9829;";
-          heart.addEventListener("click", e => {
-            e.stopPropagation();
-            addFavorite(city.name);
-          });
+          const span = document.createElement("span");
+          span.textContent = `${city.name}, ${city.region}, ${city.country}`;
   
           // Select city
           li.addEventListener("click", () => {
             autocomplete.value = city.name;
             selectedCity = city.name;
             resultsList.innerHTML = "";
+            resultsList.classList.add("hidden");
             fetchWeather(city.name);
           });
   
+          // Add favorite button
+          const heart = document.createElement("button");
+          heart.className = "heart-button";
+          heart.innerHTML = "&#9829;";
+          heart.addEventListener("click", (e) => {
+            e.stopPropagation();
+            addFavorite(city.name);
+          });
+  
+          li.appendChild(span);
           li.appendChild(heart);
           resultsList.appendChild(li);
         });
   
-        resultsList.style.display = "block";
+        resultsList.classList.remove("hidden");
       } catch (err) {
         console.error("Error fetching cities:", err);
         resultsList.innerHTML = "<li>Failed to fetch city data.</li>";
       }
     }
   
-    // Fetch weather data for a city
     async function fetchWeather(city) {
       const url = `https://api.weatherapi.com/v1/current.json?key=${API_KEY}&q=${city}`;
       showSpinner();
@@ -112,10 +121,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // ===== UI Update Functions =====
   
     function displayWeather(data) {
-      if (!data?.location || !data?.current) {
-        console.error("Invalid weather data:", data);
-        return;
-      }
+      if (!data?.location || !data?.current) return;
   
       const { name, region, country, localtime } = data.location;
       const { temp_c, condition, humidity, wind_mph } = data.current;
@@ -151,55 +157,48 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     }
   
+    function removeFavorite(city) {
+      favorites = favorites.filter(fav => fav !== city);
+      localStorage.setItem("favorites", JSON.stringify(favorites));
+      displayFavorites();
+    }
+  
     function displayFavorites() {
-        favoritesList.innerHTML = "";
-      
-        favorites.forEach(city => {
-          const li = document.createElement("li");
-          li.style.display = "flex";
-          li.style.justifyContent = "space-between";
-          li.style.alignItems = "center";
-          li.style.padding = "8px";
-          li.style.cursor = "pointer"; // cursor indică clickabil
-      
-          // Click pe întreaga li pentru a merge pe pagina orașului
-          li.addEventListener("click", () => {
-            window.location.href = `city_weather.html?city=${encodeURIComponent(city)}`;
-          });
-      
-          // Textul orașului
-          const span = document.createElement("span");
-          span.textContent = city;
-      
-          // Buton × pentru ștergere
-          const removeBtn = document.createElement("button");
-          removeBtn.textContent = "×";
-          removeBtn.className = "remove-fav";
-          removeBtn.style.marginLeft = "10px";
-      
-          // Click pe ×: șterge orașul și oprește propagarea
-          removeBtn.addEventListener("click", (e) => {
-            e.stopPropagation(); // **foarte important**
-            removeFavorite(city);
-          });
-      
-          li.appendChild(span);
-          li.appendChild(removeBtn);
-          favoritesList.appendChild(li);
+      favoritesList.innerHTML = "";
+  
+      favorites.forEach(city => {
+        const li = document.createElement("li");
+        li.style.display = "flex";
+        li.style.justifyContent = "space-between";
+        li.style.alignItems = "center";
+        li.style.padding = "8px";
+        li.style.cursor = "pointer";
+  
+        // Click pe tot chenarul
+        li.addEventListener("click", () => {
+          window.location.href = `city_weather.html?city=${encodeURIComponent(city)}`;
         });
-      
-        favoritesList.classList.remove("hidden");
-      }
-      
-      // Funcția de ștergere
-      function removeFavorite(city) {
-        favorites = favorites.filter(fav => fav !== city);
-        localStorage.setItem("favorites", JSON.stringify(favorites));
-        displayFavorites();
-      }
-      
-      
-      
+  
+        const span = document.createElement("span");
+        span.textContent = city;
+  
+        const removeBtn = document.createElement("button");
+        removeBtn.textContent = "×";
+        removeBtn.className = "remove-fav";
+        removeBtn.style.marginLeft = "10px";
+  
+        removeBtn.addEventListener("click", (e) => {
+          e.stopPropagation();
+          removeFavorite(city);
+        });
+  
+        li.appendChild(span);
+        li.appendChild(removeBtn);
+        favoritesList.appendChild(li);
+      });
+  
+      favoritesList.classList.remove("hidden"); // constant vizibilă
+    }
   
     // ===== Initialization =====
     displayFavorites();

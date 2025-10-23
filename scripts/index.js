@@ -4,7 +4,6 @@ document.addEventListener("DOMContentLoaded", () => {
     // ===== DOM Elements =====
     const autocomplete = document.getElementById("autocomplete");
     const resultsList = document.getElementById("results");
-    const favoritesList = document.getElementById("favorites");
     const weatherCard = document.getElementById("weather-card");
   
     // ===== Constants & State =====
@@ -149,58 +148,13 @@ document.addEventListener("DOMContentLoaded", () => {
   
     // ===== Favorites Handling =====
   
+    // Functia noua (fara displayFavorites())
     function addFavorite(city) {
       if (!favorites.includes(city)) {
         favorites.push(city);
         localStorage.setItem("favorites", JSON.stringify(favorites));
-        displayFavorites();
+        // Optional: Poti adauga un alert sau o notificare
+        alert(city + " was added to your favorites!");
       }
     }
-  
-    function removeFavorite(city) {
-      favorites = favorites.filter(fav => fav !== city);
-      localStorage.setItem("favorites", JSON.stringify(favorites));
-      displayFavorites();
-    }
-  
-    function displayFavorites() {
-      favoritesList.innerHTML = "";
-  
-      favorites.forEach(city => {
-        const li = document.createElement("li");
-        li.style.display = "flex";
-        li.style.justifyContent = "space-between";
-        li.style.alignItems = "center";
-        li.style.padding = "8px";
-        li.style.cursor = "pointer";
-  
-        // Click pe tot chenarul
-        li.addEventListener("click", () => {
-          window.location.href = `city_weather.html?city=${encodeURIComponent(city)}`;
-        });
-  
-        const span = document.createElement("span");
-        span.textContent = city;
-  
-        const removeBtn = document.createElement("button");
-        removeBtn.textContent = "×";
-        removeBtn.className = "remove-fav";
-        removeBtn.style.marginLeft = "10px";
-  
-        removeBtn.addEventListener("click", (e) => {
-          e.stopPropagation();
-          removeFavorite(city);
-        });
-  
-        li.appendChild(span);
-        li.appendChild(removeBtn);
-        favoritesList.appendChild(li);
-      });
-  
-      favoritesList.classList.remove("hidden"); // constant vizibilă
-    }
-  
-    // ===== Initialization =====
-    displayFavorites();
   });
-  

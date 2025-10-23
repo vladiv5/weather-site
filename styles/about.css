@@ -1,0 +1,63 @@
+/* Stilizarea containerului principal de pe pagina "About" */
+.about-container {
+    max-width: 800px;
+    margin: 20px auto; /* Centreaza containerul */
+    padding: 25px 30px;
+    
+    /* Folosim variabilele CSS definite in global.css */
+    background-color: var(--color-card);
+    color: var(--color-text);
+    
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    text-align: left; /* Aliniem textul la stanga */
+}
+
+.about-container h2 {
+    text-align: center;
+    color: var(--color-text-forecast);
+    font-size: 2rem;
+    border-bottom: 2px solid var(--color-border);
+    padding-bottom: 10px;
+    margin-bottom: 25px;
+}
+
+.about-container h3 {
+    color: var(--color-text-forecast);
+    font-size: 1.5rem;
+    margin-top: 30px;
+    margin-bottom: 15px;
+}
+
+.about-container p {
+    font-size: 1.1rem;
+    line-height: 1.7;
+    margin-bottom: 15px;
+}
+
+.about-container ul {
+    list-style: none;
+    padding-left: 0;
+}
+
+.about-container li {
+    margin-bottom: 20px;
+}
+
+.about-container li p {
+    margin-top: 5px;
+    font-size: 1rem;
+    line-height: 1.4;
+}
+
+/* Stilizarea link-urilor de atribuire */
+.about-container a {
+    color: var(--color-secondary); /* Folosim culoarea secundara */
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 1.2rem;
+}
+
+.about-container a:hover {
+    text-decoration: underline;
+}

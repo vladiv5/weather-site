@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>About - Weather Viewer</title>
+
+    <link rel="stylesheet" href="styles/global.css" />
+    <link rel="stylesheet" href="styles/spinner.css" />
+    
+    <link rel="stylesheet" href="styles/about.css" />
+
+    <script src="scripts/spinner.js" defer></script>
+</head>
+<body>
+    <div id="root">
+        
+        <header>
+            <nav class="main-nav">
+                <a href="index.html" class="nav-logo">
+                    <h1>Weather Viewer</h1>
+                </a>
+                
+                <ul class="nav-links">
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="about.html" class="active">About</a></li>
+                </ul>
+            </nav>
+        </header>
+
+        <main>
+            <div class="about-container">
+                <h2>About This Project</h2>
+                <p>
+                    This Weather Viewer is a portfolio project built using modern web technologies, including HTML5, CSS3, and vanilla JavaScript (ES6+).
+                </p>
+                <p>
+                    The application allows users to search for cities worldwide, view the current weather conditions, see a detailed 5-day forecast, and save their favorite locations using the browser's Local Storage.
+                </p>
+                
+                <h3>API Attribution</h3>
+                <p>
+                    This project relies on free external APIs to function. A huge thank you to:
+                </p>
+                <ul>
+                    <li>
+                        <a href="https://www.weatherapi.com/" target="_blank" rel="noopener noreferrer">WeatherAPI.com</a>
+                        <p>Used for all current weather data and 5-day forecasts.</p>
+                    </li>
+                    <li>
+                        <a href="https://www.pexels.com/" target="_blank" rel="noopener noreferrer">Pexels</a>
+                        <p>Used to dynamically fetch the beautiful city background images.</p>
+                    </li>
+                </ul>
+            </div>
+        </main>
+    </div>
+
+    <div id="spinner" hidden></div>
+</body>
+</html>

@@ -28,20 +28,96 @@ body {
 #root {
     max-width: 1200px;
     margin: 0 auto;
-    padding: 20px;
+    
+    /* Scoatem padding-ul implicit */
+    padding: 0; 
+    
+    /* ADAUGA ACESTE LINII: */
+    /* Acesta este spatiul vital pentru header-ul "sticky" */
+    padding-top: 100px; 
+    
+    /* Adaugam padding-ul lateral si cel de jos aici */
+    padding-left: 20px;
+    padding-right: 20px;
+    padding-bottom: 20px;
 }
 
-/* === HEADER === */
+/* === HEADER (Top Navigation Bar) === */
+/* === HEADER (Top Navigation Bar) === */
 header {
-    text-align: center;
-    margin-bottom: 30px;
+    background-color: var(--color-primary);
+    padding: 20px 0;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+
+    /* --- Modificari pentru "Sticky" --- */
+    position: fixed;  /* Il fixeaza in fereastra browser-ului */
+    top: 0;           /* Il lipeste de marginea de sus */
+    left: 0;          /* Il lipeste de marginea din stanga */
+    width: 100%;      /* Il face sa ocupe toata latimea */
+    z-index: 1000;    /* Se asigura ca e mereu deasupra */
 }
 
+/* Suprascriem culoarea H1 DOAR cand e in header */
 header h1 {
-    color: var(--color-primary);
-    font-size: 2.5rem;
+    color: var(--color-text-forecast); /* Text alb pe fundalul inchis */
+    font-size: 2.2rem; /* Putem micsora putin textul sa arate mai bine in bara */
     letter-spacing: 1px;
     margin: 0;
+}
+
+/* === STILURI NOI PENTRU NAVIGATIE === */
+
+.main-nav {
+    /* Limitam latimea si centram nav-ul, la fel ca #root */
+    max-width: 1200px; 
+    margin: 0 auto;
+    padding: 0 20px; /* Adaugam padding lateral (daca e nevoie) */
+    
+    display: flex;
+    justify-content: space-between; /* Centreaza logo-ul/titlul */
+    align-items: center;
+}
+
+.nav-logo {
+    text-decoration: none; /* Scoate sublinierea */
+    color: inherit; /* Mosteneste culoarea (alb, de la h1) */
+    transition: opacity var(--transition-fast);
+}
+
+.nav-logo:hover {
+    opacity: 0.8; /* Efect de hover */
+}
+
+/* --- STILURI NOI PENTRU LINK-URILE DIN MENIU --- */
+.nav-links {
+    list-style: none; /* Scoate bulinele */
+    display: flex;
+    margin: 0;
+    padding: 0;
+}
+
+.nav-links li {
+    margin-left: 30px; /* Spatiu intre link-uri */
+}
+
+.nav-links a {
+    text-decoration: none;
+    color: var(--color-text-forecast); /* Text alb */
+    font-size: 1.1rem;
+    font-weight: 600;
+    padding-bottom: 5px; /* Spatiu pentru sublinierea de la .active */
+    transition: color var(--transition-fast);
+}
+
+.nav-links a:hover {
+    color: var(--color-secondary); /* Culoarea la hover */
+}
+
+/* Stilul pentru link-ul paginii active */
+.nav-links a.active {
+    color: var(--color-text-forecast);
+    /* O linie subtila sub link-ul activ */
+    border-bottom: 2px solid var(--color-secondary); 
 }
 
 /* === TEXT STYLES === */

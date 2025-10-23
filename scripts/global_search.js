@@ -57,11 +57,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 // --- Am sters stilurile inline, le-am mutat in CSS ---
 
+                const uniqueName = `${city.name}, ${city.country}`;
                 const span = document.createElement("span");
-                span.textContent = `${city.name}, ${city.region}, ${city.country}`;
+                span.textContent = uniqueName;
 
-                // --- MODIFICARE ---
-                // Acum, un click pe un oras REDIRECTIONEAZA
                 li.addEventListener("click", () => {
                     window.location.href = `city_weather.html?city=${encodeURIComponent(city.name)}`;
                 });
@@ -72,7 +71,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 heart.innerHTML = "&#9829;";
                 heart.addEventListener("click", (e) => {
                     e.stopPropagation(); // Opreste redirectarea
-                    addFavorite(city.name);
+                    addFavorite(uniqueName);
                 });
 
                 li.appendChild(span);
@@ -96,6 +95,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
             // Afiseaza pop-up-ul
             showToast(`Added ${city} to favorites!`);
+
+            // Anunta restul aplicatiei (in special pagina de favorite)
+            const event = new CustomEvent('favoriteAdded', { detail: { city: city } });
+            document.dispatchEvent(event);
+
         } else {
             showToast(`${city} is already in your favorites.`);
         }

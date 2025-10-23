@@ -37,9 +37,11 @@ document.addEventListener("DOMContentLoaded", () => {
             favoritesGrid.innerHTML = ""; 
             
             // Cream si adaugam cardurile
-            weatherDataList.forEach(data => {
+            weatherDataList.forEach((data, index) => {
+                const originalCityName = favorites[index];
+
                 if (data && data.location) {
-                    const card = createFavoriteCard(data);
+                    const card = createFavoriteCard(data, originalCityName);
                     favoritesGrid.innerHTML += card;
                 }
             });
@@ -71,16 +73,16 @@ document.addEventListener("DOMContentLoaded", () => {
     /**
      * Construieste HTML-ul pentru un singur card
      */
-    function createFavoriteCard(data) {
+    function createFavoriteCard(data, originalCityName) { // <-- Argument nou
+        // Folosim datele din API pentru afisare
         const { name, country } = data.location;
         const { temp_c, condition, wind_mph, humidity } = data.current;
 
-        // Reutilizam clasa .grid-item din weather_cards.css
-        // Adaugam un atribut "data-city" pentru a sti ce sa stergem
+        // Folosim "originalCityName" (din localStorage) pentru data-atribute
         return `
-            <li class="grid-item favorite-card" data-city="${name}">
+            <li class="grid-item favorite-card" data-city="${originalCityName}">
                 <div class="status">
-                    <button class="remove-fav-card" data-city="${name}">&times;</button>
+                    <button class="remove-fav-card" data-city="${originalCityName}">&times;</button>
                     <p class="cardtitle">${name}</p>
                     <p class="subtext"><strong>${country}</strong></p>
                     <p class="subtext"><strong>Temp:</strong> ${temp_c} &deg;C</p>
@@ -132,6 +134,35 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
+    /**
+ * Functie NOUA: Adauga un singur card nou in grila,
+ * apelata de evenimentul 'favoriteAdded'
+ */
+async function appendNewFavoriteCard(city) {
+    try {
+        // 1. Cere datele meteo pentru noul oras
+        const data = await fetchWeather(city);
+
+        if (data && data.location) {
+            // 2. Creaza HTML-ul cardului
+            // Folosim 'city' (numele original) pentru stergere
+            const cardHTML = createFavoriteCard(data, city);
+
+            // 3. Ascunde mesajul "lista goala", daca e vizibil
+            emptyMsg.classList.add("hidden");
+
+            // 4. Adauga noul card in grila
+            // 'insertAdjacentHTML' e mai eficient decat 'innerHTML +='
+            favoritesGrid.insertAdjacentHTML('beforeend', cardHTML);
+        }
+    } catch (error) {
+        console.error("Failed to append new favorite card:", error);
+        // Nu afisam toast, 'global_search' a facut-o deja
+    } finally {
+
+    }
+}
+
     function showToast(message) {
         if (!toast) return; // Daca elementul toast nu exista
         
@@ -149,7 +180,14 @@ document.addEventListener("DOMContentLoaded", () => {
         }, 3000);
     }
 
-    
+    /**
+ * Asculta evenimentul global 'favoriteAdded' trimis de
+ * global_search.js si adauga noul card pe pagina.
+ */
+document.addEventListener('favoriteAdded', (e) => {
+    const newCity = e.detail.city;
+    appendNewFavoriteCard(newCity);
+});
 
     // --- Initializare ---
     loadFavorites();

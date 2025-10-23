@@ -4,6 +4,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const apiKey = '1ed72901fef34a7da48182141250901'; // Cheia ta API
     const favoritesGrid = document.getElementById("favorites-grid");
     const emptyMsg = document.getElementById("empty-favorites-msg");
+    const toast = document.getElementById("toast-notification");
 
     // --- Functii ---
 
@@ -122,11 +123,33 @@ document.addEventListener("DOMContentLoaded", () => {
             cardToRemove.remove();
         }
 
+        // Afiseaza notificarea de stergere
+        showToast(`Removed ${city} from favorites.`);
+
         // Daca am sters ultimul card, afisam mesajul "lista goala"
         if (favorites.length === 0) {
             emptyMsg.classList.remove("hidden");
         }
     }
+
+    function showToast(message) {
+        if (!toast) return; // Daca elementul toast nu exista
+        
+        toast.textContent = message;
+        toast.classList.add("show");
+        toast.classList.remove("hidden"); // Asigurare
+
+        // Ascunde pop-up-ul dupa 3 secunde
+        setTimeout(() => {
+            toast.classList.remove("show");
+            // Adaugam un mic delay pt tranzitia de "fade-out"
+            setTimeout(() => {
+                toast.classList.add("hidden");
+            }, 300); // Trebuie sa fie la fel ca tranzitia CSS
+        }, 3000);
+    }
+
+    
 
     // --- Initializare ---
     loadFavorites();

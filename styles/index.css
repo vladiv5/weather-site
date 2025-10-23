@@ -5,56 +5,6 @@
     align-items: center;
 }
 
-/* === AUTOCOMPLETE INPUT === */
-#autocomplete {
-    width: 100%;
-    max-width: 500px;
-    padding: 10px;
-    font-size: 16px;
-    margin-bottom: 10px;
-    border: 1px solid var(--color-border);
-    border-radius: 4px;
-    background-color: var(--color-card);
-    color: var(--color-text);
-}
-
-#autocomplete::placeholder {
-    text-align: center;
-    color: var(--color-subtext);
-}
-
-/* === RESULTS & FAVORITES LIST === */
-#results,
-#favorites {
-    list-style: none;
-    color: var(--color-text);
-    padding: 0;
-    width: 100%;
-    max-width: 500px;
-    max-height: 200px;
-    overflow-y: auto;
-    background-color: var(--color-card);
-    border: 1px solid var(--color-border);
-    border-radius: 6px;
-    margin-top: 10px;
-}
-
-#results li,
-#favorites li {
-    padding: 10px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    cursor: pointer;
-    transition: background-color var(--transition-fast);
-}
-
-#results li:hover,
-#favorites li:hover {
-    background-color: var(--color-primary);
-    color: var(--color-text);
-}
-
 /* === WEATHER CARD === */
 #weather-card {
     background-color: var(--color-card);

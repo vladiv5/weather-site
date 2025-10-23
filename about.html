@@ -11,6 +11,7 @@
     <link rel="stylesheet" href="styles/about.css" />
 
     <script src="scripts/spinner.js" defer></script>
+    <script src="scripts/global_search.js" defer></script>
 </head>
 <body>
     <div id="root">
@@ -21,6 +22,15 @@
                     <h1>Weather Viewer</h1>
                 </a>
                 
+                <div class="nav-search">
+                    <input
+                        type="text"
+                        id="autocomplete"
+                        placeholder="Search for a city"
+                        aria-label="Search for a city"
+                    />
+                    <ul id="results" class="hidden"></ul>
+                </div>
                 <ul class="nav-links">
                     <li><a href="index.html">Home</a></li>
                     <li><a href="favorites.html">Favorites</a></li>
@@ -58,5 +68,6 @@
     </div>
 
     <div id="spinner" hidden></div>
+    <div id="toast-notification" class="hidden"></div>
 </body>
 </html>

@@ -15,6 +15,7 @@
     <script src="scripts/spinner.js" defer></script>
     <script src="scripts/index.js" defer></script>
     <script src="scripts/weather_cards.js" defer></script>
+    <script src="scripts/global_search.js" defer></script>
   </head>
 
   <body>
@@ -24,12 +25,23 @@
           <a href="index.html" class="nav-logo">
             <h1>Weather Viewer</h1>
           </a>
-    
-          <ul class="nav-links">
-            <li><a href="index.html" class="active">Home</a></li>
-            <li><a href="favorites.html">Favorites</a></li>
-            <li><a href="about.html">About</a></li>
-        </nav>
+
+          <div class="nav-search">
+              <input
+                  type="text"
+                  id="autocomplete"
+                  placeholder="Search for a city"
+                  aria-label="Search for a city"
+              />
+              <ul id="results" class="hidden"></ul>
+          </div>
+
+    <ul class="nav-links">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="favorites.html">Favorites</a></li>
+        <li><a href="about.html">About</a></li>
+    </ul>
+</nav>
       </header>
 
       <!-- Weather category cards -->
@@ -86,20 +98,10 @@
       </ul>
 
       <main>
-        <div class="search-container">
-          <input
-            type="text"
-            id="autocomplete"
-            placeholder="Search for a city"
-            aria-label="Search for a city"
-          />
-          <ul id="results"></ul>
-        </div>
-
-        <section id="weather-card" class="hidden"></section>
       </main>
     </div>
 
     <div id="spinner" hidden></div>
+    <div id="toast-notification" class="hidden"></div>
   </body>
 </html>

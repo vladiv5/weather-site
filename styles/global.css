@@ -87,6 +87,82 @@ header h1 {
     align-items: center;
 }
 
+/* Containerul barei de cautare din NAV */
+.nav-search {
+    position: relative; /* Necesar pentru lista de rezultate */
+    width: 40%; /* Ocupa 40% din spatiul din header */
+    max-width: 500px;
+}
+
+/* Regula mutata din index.css - usor modificata */
+#autocomplete {
+    width: 100%; /* Ocupa tot spatiul containerului .nav-search */
+    padding: 10px;
+    font-size: 16px;
+
+    /* Am scos margin-bottom */
+    border: 1px solid var(--color-border);
+    border-radius: 4px;
+    background-color: var(--color-card);
+    color: var(--color-text);
+}
+
+/* Regula mutata din index.css - usor modificata */
+#autocomplete::placeholder {
+    text-align: center;
+    color: var(--color-subtext);
+}
+
+/* Regula mutata din index.css - MODIFICARE CRITICA */
+#results {
+    position: absolute; /* Apare DEASUPRA continutului, sub bara */
+    top: 110%; /* Putin spatiu sub bara de cautare */
+    left: 0;
+    right: 0;
+
+    list-style: none;
+    color: var(--color-text);
+    padding: 0;
+    width: 100%; /* Aceeasi latime ca #autocomplete */
+    max-height: 200px;
+    overflow-y: auto;
+    background-color: var(--color-card);
+    border: 1px solid var(--color-border);
+    border-radius: 6px;
+    margin-top: 0; /* Am scos margin-top */
+    z-index: 1100; /* Peste tot, sub pop-up */
+}
+
+/* Regula mutata din index.css (ramane la fel) */
+#results li,
+#favorites li {
+    padding: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    transition: background-color var(--transition-fast);
+}
+
+#results li:hover,
+#favorites li:hover {
+    background-color: var(--color-primary);
+    color: var(--color-text);
+}
+
+/* Regula mutata din index.css (ramane la fel) */
+.heart-button {
+    background: none;
+    border: none;
+    color: red;
+    font-size: 1.3rem;
+    cursor: pointer;
+    transition: transform var(--transition-fast);
+}
+.heart-button:hover {
+    transform: scale(1.2);
+}
+
 .nav-logo {
     text-decoration: none; /* Scoate sublinierea */
     color: inherit; /* Mosteneste culoarea (alb, de la h1) */
@@ -140,4 +216,32 @@ header h1 {
 /* === UTILITY CLASSES === */
 .hidden {
     display: none !important;
+}
+
+/* === TOAST NOTIFICATION === */
+#toast-notification {
+    position: fixed; /* Sta pe loc, chiar daca dai scroll */
+    bottom: 30px; /* Sta la 30px deasupra marginii de jos */
+    left: 50%; /* Centrat orizontal */
+    transform: translateX(-50%); /* Ajustare fina pentru centrare */
+
+    background-color: var(--color-primary);
+    color: var(--color-text-forecast);
+    padding: 16px 25px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+
+    z-index: 2000; /* Peste orice altceva, chiar si peste spinner */
+
+    /* Tranzitie pentru show/hide */
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease, bottom 0.3s ease;
+}
+
+/* Clasa pe care o adaugam cu JS pentru a-l afisa */
+#toast-notification.show {
+    opacity: 1;
+    visibility: visible;
+    bottom: 50px; /* Apare cu un mic efect de "ridicare" */
 }

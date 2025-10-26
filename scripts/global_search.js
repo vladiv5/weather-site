@@ -3,6 +3,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const autocomplete = document.getElementById("autocomplete");
     const resultsList = document.getElementById("results");
     const toast = document.getElementById("toast-notification");
+    const getLocationBtn = document.getElementById("get-location-btn");
 
     const API_KEY = "1ed72901fef34a7da48182141250901"; // Cheia ta
     let favorites = JSON.parse(localStorage.getItem("favorites")) || [];
@@ -49,6 +50,19 @@ document.addEventListener("DOMContentLoaded", () => {
         favorites = favorites.filter(fav => fav !== removedCity);
         console.log('Internal favorites updated after removal:', favorites); // Optional: pentru debugging
     });
+
+    getLocationBtn.addEventListener('click', () => {
+    if (navigator.geolocation) {
+        showSpinner(); // Afiseaza spinner cat timp asteptam
+        navigator.geolocation.getCurrentPosition(geolocationSuccess, geolocationError, {
+            enableHighAccuracy: true, // Incearca sa obtina o locatie mai precisa
+            timeout: 10000,         // Timp maxim de asteptare (10 secunde)
+            maximumAge: 0           // Forteaza obtinerea unei locatii proaspete
+        });
+    } else {
+        showToast("Geolocation is not supported by this browser.");
+    }
+});
 
     // --- Functii API & Favorite ---
 
@@ -117,7 +131,6 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-    // --- FUNCTIE NOUA ---
     // Functia pentru a afisa pop-up-ul
     function showToast(message) {
         if (!toast) return; // Daca elementul toast nu exista
@@ -137,4 +150,46 @@ document.addEventListener("DOMContentLoaded", () => {
             }, 300); // Trebuie sa fie la fel ca tranzitia CSS
         }, 3000);
     }
+    
+    /**
+     * Callback apelat cand geolocatia reuseste.
+     * Redirectioneaza catre pagina meteo folosind coordonatele.
+     */
+    function geolocationSuccess(position) {
+        hideSpinner(); // Ascunde spinner-ul
+        const lat = position.coords.latitude;
+        const lon = position.coords.longitude;
+
+        // Formateaza coordonatele pentru API (lat,lon)
+        const query = `${lat},${lon}`;
+
+        // Redirectioneaza catre pagina meteo
+        window.location.href = `city_weather.html?city=${encodeURIComponent(query)}`;
+    }
+
+    /**
+     * Callback apelat cand geolocatia esueaza sau este refuzata.
+     */
+    function geolocationError(error) {
+        hideSpinner(); // Ascunde spinner-ul
+        console.error("Geolocation error:", error);
+        let message = "Could not get your location.";
+        switch(error.code) {
+            case error.PERMISSION_DENIED:
+                message = "Geolocation permission denied. Please enable it in your browser settings.";
+                break;
+            case error.POSITION_UNAVAILABLE:
+                message = "Location information is unavailable.";
+                break;
+            case error.TIMEOUT:
+                message = "The request to get user location timed out.";
+                break;
+            case error.UNKNOWN_ERROR:
+                message = "An unknown error occurred while getting location.";
+                break;
+        }
+        showToast(message); // Afiseaza eroarea utilizatorului
+    }
+
 });
+

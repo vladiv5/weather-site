@@ -3,6 +3,12 @@ document.addEventListener("DOMContentLoaded", (_event) => {
     const pexelsApiKey = 'wyj6VC2CBQIWPciaWM5rU3aD5PI0IOFiADXB075GuZrd0lKG3sUvUalh';
     const forecastCard = document.getElementById("forecast-card");
     const currentWeatherCard = document.getElementById("current-weather-card");
+    const dailyChartContainer = document.getElementById("daily-temp-chart-container");
+    const hourlyChartContainer = document.getElementById("hourly-rain-chart-container");
+    const dailyTempCtx = document.getElementById('dailyTempChart')?.getContext('2d');
+    const hourlyRainCtx = document.getElementById('hourlyRainChart')?.getContext('2d');
+    let dailyTempChartInstance = null; // Variabile pentru a tine graficele
+    let hourlyRainChartInstance = null;
 
     function getCityFromUrl() {
         const params = new URLSearchParams(window.location.search);
@@ -10,21 +16,45 @@ document.addEventListener("DOMContentLoaded", (_event) => {
     }
 
     // Functie pentru a extrage prognoza meteo pentru un oras si a afisa spinner-ul
-    function fetchForecast(city) {
-        const url = `http://api.weatherapi.com/v1/forecast.json?key=${apiKey}&q=${city}&days=5`;
+    function fetchForecast(cityOrCoords) {
+        const url = `http://api.weatherapi.com/v1/forecast.json?key=${apiKey}&q=${cityOrCoords}&days=5`;
 
         showSpinner();
         fetch(url)
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Weather API request failed');
+                }
+                return response.json();
+            })
+
             .then(data => {
                 console.log("Fetched forecast data:", data);
                 displayForecast(data);
                 displayCurrentWeather(data);
-                fetchCityPhoto(city);
+
+                if (data && data.location && data.location.name) {
+                    const cityName = data.location.name;
+                    fetchCityPhoto(cityName);
+                } else {
+                    console.error("Could not get city name from Weather API response to fetch photo.");
+                }
+
+                createDailyTempChart(data);;
+                createHourlyRainChart(data);
+
                 hideSpinner();
             })
+
             .catch(error => {
                 console.error("Error fetching forecast data:", error);
+                forecastCard.innerHTML = "<p>Could not load forecast data. Please check the city name or try again later.</p>";
+                forecastCard.classList.remove("hidden");
+                currentWeatherCard.classList.add("hidden");
+
+                dailyChartContainer.classList.add("hidden");
+                hourlyChartContainer.classList.add("hidden");
+
                 hideSpinner();
             });
     }
@@ -134,5 +164,134 @@ document.addEventListener("DOMContentLoaded", (_event) => {
         fetchForecast(city);
     } else {
         console.error("No city specified in URL parameters");
+    }
+
+    /**
+    * Creează și afișează graficul pentru temperatura zilnică (max/min).
+    */
+    function createDailyTempChart(data) {
+        if (!dailyTempCtx || !data?.forecast?.forecastday) {
+            console.error("Daily temp chart context or forecast data missing.");
+            dailyChartContainer.classList.add("hidden");
+            return;
+        }
+
+        // Distruge graficul vechi daca exista (pentru cautari noi)
+        if (dailyTempChartInstance) {
+            dailyTempChartInstance.destroy();
+        }
+
+        const forecastDays = data.forecast.forecastday;
+
+        // Extrage datele pentru grafic
+        const labels = forecastDays.map(day => day.date.substring(5)); // Format 'MM-DD'
+        const maxTemps = forecastDays.map(day => day.day.maxtemp_c);
+        const minTemps = forecastDays.map(day => day.day.mintemp_c);
+
+        dailyChartContainer.classList.remove("hidden"); // Arata containerul
+
+        dailyTempChartInstance = new Chart(dailyTempCtx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [
+                    {
+                        label: 'Max Temp (°C)',
+                        data: maxTemps,
+                        borderColor: 'rgb(255, 99, 132)', // Rosu
+                        backgroundColor: 'rgba(255, 99, 132, 0.5)',
+                        tension: 0.1 // Linie usor curba
+                    },
+                    {
+                        label: 'Min Temp (°C)',
+                        data: minTemps,
+                        borderColor: 'rgb(54, 162, 235)', // Albastru
+                        backgroundColor: 'rgba(54, 162, 235, 0.5)',
+                        tension: 0.1
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false, // Permite graficului sa umple containerul
+                scales: {
+                    y: {
+                        beginAtZero: false, // Axa Y poate incepe de la temp. negative
+                        ticks: { color: 'white' }, // Culoare text axe
+                        grid: { color: 'rgba(255, 255, 255, 0.2)' } // Culoare linii grid
+                    },
+                    x: {
+                        ticks: { color: 'white' },
+                        grid: { color: 'rgba(255, 255, 255, 0.2)' }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        labels: { color: 'white' } // Culoare text legenda
+                    }
+                }
+            }
+        });
+    }
+
+    /**
+     * Creează și afișează graficul orar pentru șansa de ploaie.
+     */
+    function createHourlyRainChart(data) {
+        // WeatherAPI ofera prognoza orara doar pentru ziua curenta si urmatoarele 2 zile
+        // Vom lua datele orare din prima zi de prognoza.
+        if (!hourlyRainCtx || !data?.forecast?.forecastday?.[0]?.hour) {
+            console.error("Hourly rain chart context or hourly forecast data missing.");
+            hourlyChartContainer.classList.add("hidden");
+            return;
+        }
+
+        // Distruge graficul vechi
+        if (hourlyRainChartInstance) {
+            hourlyRainChartInstance.destroy();
+        }
+
+        const hourlyData = data.forecast.forecastday[0].hour;
+
+        // Extrage datele (ora si sansa de ploaie)
+        const labels = hourlyData.map(hourData => hourData.time.substring(11)); // Format 'HH:MM'
+        const rainChance = hourlyData.map(hourData => hourData.chance_of_rain);
+
+        hourlyChartContainer.classList.remove("hidden");
+
+        hourlyRainChartInstance = new Chart(hourlyRainCtx, {
+            type: 'bar', // Grafic cu bare
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Chance of Rain (%)',
+                    data: rainChance,
+                    backgroundColor: 'rgba(75, 192, 192, 0.6)', // Culoare bare
+                    borderColor: 'rgb(75, 192, 192)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: 100, // Procentaj maxim e 100
+                        ticks: { color: 'white', stepSize: 20 },
+                        grid: { color: 'rgba(255, 255, 255, 0.2)' }
+                    },
+                    x: {
+                        ticks: { color: 'white', maxRotation: 90, minRotation: 70 }, // Rotesc etichetele orei
+                        grid: { display: false } // Ascund gridul X
+                    }
+                },
+                plugins: {
+                    legend: {
+                        display: false // Nu avem nevoie de legenda pt un singur set de date
+                    }
+                }
+            }
+        });
     }
 });

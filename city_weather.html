@@ -11,6 +11,7 @@
     <script src="scripts/city_weather.js" defer></script>
     <script src="scripts/weather_cards.js" defer></script>
     <script src="scripts/global_search.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script> 
 </head>
 <body>
     <div id="root">
@@ -27,6 +28,9 @@
                     placeholder="Search for a city"
                     aria-label="Search for a city"
                 />
+                <button id="get-location-btn" title="Use current location">
+                📍 
+                </button>
                 <ul id="results" class="hidden"></ul>
             </div>
 
@@ -41,6 +45,16 @@
             <h2 class="subtitle">Forecast for the next 5 days</h2>
             <div class="content-container">
                 <div id="forecast-card" class="hidden"></div>
+                <div class="chart-container hidden" id="daily-temp-chart-container">
+                    <h3>Temperature Trend (°C)</h3>
+                    <canvas id="dailyTempChart"></canvas>
+                </div>
+
+                <div class="chart-container hidden" id="hourly-rain-chart-container">
+                    <h3>Hourly Rainfall (%)</h3>
+                    <canvas id="hourlyRainChart"></canvas>
+                </div>
+
                 <div id="current-weather-card" class="hidden"></div>
             </div>
         </main>

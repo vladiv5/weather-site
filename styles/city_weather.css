@@ -1,9 +1,3 @@
-.content-container {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-}
-
 #forecast-card {
     background-color: var(--color-card-forecast);
     padding: 20px;
@@ -67,3 +61,72 @@
 .sunny { left: 141px !important; }
 .night { left: 220px !important; }
 .rain, .snow, .storm { left: 120px !important; }
+
+/* === CHART STYLES === */
+
+.chart-container {
+    background-color: var(--color-card-forecast); /* Aceeasi culoare ca si cardurile */
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    margin-top: 20px;
+    width: 100%; /* Ocupa toata latimea disponibila */
+    color: var(--color-text-forecast);
+}
+
+.chart-container h3 {
+    text-align: center;
+    margin-bottom: 20px;
+    font-size: 1.2rem;
+    color: var(--color-subtitle);
+}
+
+/* Ajustam layout-ul containerului principal pentru a include graficele */
+.content-container {
+    display: flex;
+    flex-wrap: wrap; /* Permite elementelor sa treaca pe randul urmator */
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+/* Facem ca tabelul si cardul meteo sa ocupe mai putin spatiu initial */
+#forecast-card {
+    width: 100%; /* Ocupa toata latimea initial */
+    order: 1; /* Primul element */
+}
+
+/* Plasam graficele sub tabel */
+#daily-temp-chart-container {
+    width: 100%; /* Ocupa toata latimea */
+    order: 2; /* Al doilea element */
+}
+
+#hourly-rain-chart-container {
+     width: 100%; /* Ocupa toata latimea */
+     order: 3; /* Al treilea element */
+}
+
+
+#current-weather-card {
+    width: 100%; /* Ocupa toata latimea */
+    margin-top: 20px; /* Spatiu fata de graficul de ploaie */
+    order: 4; /* Ultimul element */
+}
+
+/* Optional: Pe ecrane mai mari, putem aranja altfel */
+@media (min-width: 900px) {
+    #forecast-card {
+        width: 60%; /* Reia latimea initiala */
+    }
+    #current-weather-card {
+        width: 35%; /* Reia latimea initiala */
+         margin-top: 20px; /* Pastram marginea de sus */
+         order: 2; /* Il mutam langa tabel */
+    }
+     #daily-temp-chart-container {
+         order: 3; /* Graficul de temperatura sub ele */
+    }
+    #hourly-rain-chart-container {
+         order: 4; /* Graficul de ploaie ultimul */
+    }
+}

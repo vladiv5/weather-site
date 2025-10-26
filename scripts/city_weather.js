@@ -17,7 +17,7 @@ document.addEventListener("DOMContentLoaded", (_event) => {
 
     // Functie pentru a extrage prognoza meteo pentru un oras si a afisa spinner-ul
     function fetchForecast(cityOrCoords) {
-        const url = `http://api.weatherapi.com/v1/forecast.json?key=${apiKey}&q=${cityOrCoords}&days=5`;
+        const url = `http://api.weatherapi.com/v1/forecast.json?key=${apiKey}&q=${cityOrCoords}&days=7`;
 
         showSpinner();
         fetch(url)
@@ -213,7 +213,8 @@ document.addEventListener("DOMContentLoaded", (_event) => {
             },
             options: {
                 responsive: true,
-                maintainAspectRatio: false, // Permite graficului sa umple containerul
+                maintainAspectRatio: true,
+                aspectRatio: 3,
                 scales: {
                     y: {
                         beginAtZero: false, // Axa Y poate incepe de la temp. negative
@@ -273,7 +274,8 @@ document.addEventListener("DOMContentLoaded", (_event) => {
             },
             options: {
                 responsive: true,
-                maintainAspectRatio: false,
+                maintainAspectRatio: true,
+                aspectRatio: 3,
                 scales: {
                     y: {
                         beginAtZero: true,

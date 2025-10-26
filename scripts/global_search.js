@@ -6,6 +6,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const API_KEY = "1ed72901fef34a7da48182141250901"; // Cheia ta
     let favorites = JSON.parse(localStorage.getItem("favorites")) || [];
+    let toastTimer;
 
     // --- Event Listeners pentru Autocomplete ---
 
@@ -36,6 +37,17 @@ document.addEventListener("DOMContentLoaded", () => {
         if (!isClickInsideSearch) {
             resultsList.classList.add("hidden");
         }
+    });
+
+    /**
+     * Asculta evenimentul global 'favoriteRemoved' trimis de
+     * favorites.js si actualizeaza lista interna 'favorites'.
+     */
+    document.addEventListener('favoriteRemoved', (e) => {
+        const removedCity = e.detail.city;
+        // Filtreaza lista interna 'favorites' pentru a elimina orasul
+        favorites = favorites.filter(fav => fav !== removedCity);
+        console.log('Internal favorites updated after removal:', favorites); // Optional: pentru debugging
     });
 
     // --- Functii API & Favorite ---
@@ -110,12 +122,14 @@ document.addEventListener("DOMContentLoaded", () => {
     function showToast(message) {
         if (!toast) return; // Daca elementul toast nu exista
 
+        clearTimeout(toastTimer); // Reseteaza timer-ul daca exista unul activ
+
         toast.textContent = message;
         toast.classList.add("show");
         toast.classList.remove("hidden"); // Asigurare
 
         // Ascunde pop-up-ul dupa 3 secunde
-        setTimeout(() => {
+        toastTimer = setTimeout(() => {
             toast.classList.remove("show");
             // Adaugam un mic delay pt tranzitia de "fade-out"
             setTimeout(() => {

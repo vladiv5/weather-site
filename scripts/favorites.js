@@ -6,6 +6,8 @@ document.addEventListener("DOMContentLoaded", () => {
     const emptyMsg = document.getElementById("empty-favorites-msg");
     const toast = document.getElementById("toast-notification");
 
+    let toastTimer;
+
     // --- Functii ---
 
     /**
@@ -45,10 +47,6 @@ document.addEventListener("DOMContentLoaded", () => {
                     favoritesGrid.innerHTML += card;
                 }
             });
-
-            // Adaugam event listeners pentru noile butoane de stergere
-            setupRemoveButtons();
-
         } catch (error) {
             console.error("Error fetching one or more favorites:", error);
             favoritesGrid.innerHTML = "<p>Could not load favorites data. Please try again later.</p>";
@@ -112,12 +110,10 @@ document.addEventListener("DOMContentLoaded", () => {
      */
     function removeFavorite(city) {
         let favorites = JSON.parse(localStorage.getItem("favorites")) || [];
-        
-        // Cream o lista noua fara orasul selectat
-        favorites = favorites.filter(fav => fav !== city);
+        const updatedFavorites = favorites.filter(fav => fav !== city);
         
         // Salvam lista noua in localStorage
-        localStorage.setItem("favorites", JSON.stringify(favorites));
+        localStorage.setItem("favorites", JSON.stringify(updatedFavorites));
         
         // Stergem cardul de pe pagina (fara refresh)
         const cardToRemove = document.querySelector(`.favorite-card[data-city="${city}"]`);
@@ -127,6 +123,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
         // Afiseaza notificarea de stergere
         showToast(`Removed ${city} from favorites.`);
+
+        // Anunta restul aplicatiei (in special global_search.js)
+        const event = new CustomEvent('favoriteRemoved', { detail: { city: city } });
+        document.dispatchEvent(event);
 
         // Daca am sters ultimul card, afisam mesajul "lista goala"
         if (favorites.length === 0) {
@@ -165,13 +165,22 @@ async function appendNewFavoriteCard(city) {
 
     function showToast(message) {
         if (!toast) return; // Daca elementul toast nu exista
+
+        clearTimeout(toastTimer); // Reseteaza timer-ul daca exista unul activ
         
         toast.textContent = message;
-        toast.classList.add("show");
         toast.classList.remove("hidden"); // Asigurare
+        toast.classList.remove("show");
+
+        // Pasul 2: Folosim un timeout mic (sau requestAnimationFrame)
+        // pentru a lasa browser-ul sa aplice pasul 1 inainte de a porni animatia
+        setTimeout(() => {
+            toast.classList.add("show"); // Adauga clasa care declanseaza animatia
+        }, 10); // Un delay foarte mic, de obicei suficient
+        // ------------------
 
         // Ascunde pop-up-ul dupa 3 secunde
-        setTimeout(() => {
+        toastTimer = setTimeout(() => {
             toast.classList.remove("show");
             // Adaugam un mic delay pt tranzitia de "fade-out"
             setTimeout(() => {
@@ -190,5 +199,6 @@ document.addEventListener('favoriteAdded', (e) => {
 });
 
     // --- Initializare ---
+    setupRemoveButtons();
     loadFavorites();
 });

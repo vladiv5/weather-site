@@ -256,7 +256,7 @@ document.addEventListener("DOMContentLoaded", (_event) => {
 
         // Extrage datele (ora si sansa de ploaie)
         const labels = hourlyData.map(hourData => hourData.time.substring(11)); // Format 'HH:MM'
-        const rainChance = hourlyData.map(hourData => hourData.chance_of_rain);
+        const rainChance = hourlyData.map(hourData => hourData.chance_of_rain + 1);
 
         hourlyChartContainer.classList.remove("hidden");
 
@@ -278,9 +278,21 @@ document.addEventListener("DOMContentLoaded", (_event) => {
                 aspectRatio: 3,
                 scales: {
                     y: {
-                        beginAtZero: true,
-                        max: 100, // Procentaj maxim e 100
-                        ticks: { color: 'white', stepSize: 20 },
+                        //beginAtZero: true,
+                        min: 0,
+                        max: 101, // Procentaj maxim e 100
+                        ticks: {
+                            color: 'white',
+                            stepSize: 20,
+                            callback: function(value) {
+                                if (value === 1) return '0%'; // Corectare pentru valoarea 1
+                                if (value === 101) return '100%'; // Corectare pentru valoarea 101
+                                if (value % 20 === 0) {
+                                    return (value) + '%';
+                                }
+                                return '';
+                            }
+                        },
                         grid: { color: 'rgba(255, 255, 255, 0.2)' }
                     },
                     x: {
@@ -291,6 +303,20 @@ document.addEventListener("DOMContentLoaded", (_event) => {
                 plugins: {
                     legend: {
                         display: false // Nu avem nevoie de legenda pt un singur set de date
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                let label = context.dataset.label || '';
+                                if (label) {
+                                    label += ': ';
+                                }
+                                // Scad 1 pentru a corecta valoarea afisata
+                                const actualValue = context.parsed.y - 1;
+                                label += actualValue + '%';
+                                return label;
+                            }
+                        }
                     }
                 }
             }

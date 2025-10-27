@@ -119,29 +119,54 @@ document.addEventListener("DOMContentLoaded", (_event) => {
         }
     }
 
-    // Functie pentru a determina animatia in functie de vreme
-    function getWeatherAnimationClass(data) {
-        const hour = new Date(data.last_updated).getHours();
-        console.log('hour:', hour, 'localtime:', data.localtime);
-        if (hour >= 18 || hour < 6) {
-            return 'night';
-        } else if (data.condition.text.toLowerCase().includes('rain') || data.condition.text.toLowerCase().includes('cloudy')) {
-            return 'rain';
-        } else if (data.condition.text.toLowerCase().includes('snow')) {
-            return 'snow';
-        } else if (data.condition.text.toLowerCase().includes('storm') || data.condition.text.toLowerCase().includes('thunder') || data.condition.text.toLowerCase().includes('heavy')) {
-            return 'storm';
-        } else if (data.condition.text.toLowerCase().includes('sunny') || data.condition.text.toLowerCase().includes('clear')) {
-            return 'sunny';
-        } else {
-            return '';
+    function determineWeatherClass(weatherData) {
+        if (!weatherData || !weatherData.condition || !weatherData.condition.text) return '';
+
+        const conditionText = weatherData.condition.text.toLowerCase();
+        const timeString = weatherData.localtime || weatherData.last_updated;
+        let hour = -1;
+        if (timeString) {
+            try {
+                const timePart = timeString.split(' ')[1];
+                hour = timePart ? parseInt(timePart.split(':')[0], 10) : new Date(timeString).getHours();
+            } catch(e) { console.error("Could not parse time:", timeString); }
         }
+        console.log('Determining class - Hour:', hour, 'Condition:', conditionText);
+
+        // Ninsoare
+        if (conditionText.includes('snow') || conditionText.includes('sleet') || conditionText.includes('ice pellets')) {
+            return 'snow';
+        }
+        // Furtuna
+        if (conditionText.includes('thunder') || conditionText.includes('storm') || conditionText.includes('heavy rain') || conditionText.includes('torrential rain')) {
+            return 'storm';
+        }
+        // Ploaie
+        if (conditionText.includes('rain') || conditionText.includes('drizzle') || conditionText.includes('cloudy') || conditionText.includes('overcast') || conditionText.includes('mist') || conditionText.includes('fog')) {
+            return 'rain';
+        }
+        // Noapte
+        if (hour !== -1 && (hour >= 18 || hour < 6)) {
+            return 'night';
+        }
+        // Soare
+        if (conditionText.includes('sunny') || conditionText.includes('clear') || conditionText.includes('partly cloudy')) {
+            return 'sunny';
+        }
+        // 6. Default: Nimic
+        return '';
     }
 
     // Functie pentru a afisa datele meteo curente
     function displayCurrentWeather(data) {
-        if (data && data.current && data.location) {
-            const weatherAnimationClass = getWeatherAnimationClass(data.current);
+        if (data?.current && data?.location) {
+            const weatherAnimationClass = determineWeatherClass({
+                condition: data.current.condition,
+                localtime: data.location.localtime,
+                last_updated: data.current.last_updated
+            });
+
+
             const currentWeather = `
                 <div class="card card-${weatherAnimationClass}">
                     <div class="${weatherAnimationClass} city-weather-animation"></div>

@@ -68,3 +68,70 @@
     text-align: left;
   }
   
+  /* === NEWS SECTION === */
+#news-section {
+    background-color: var(--color-card); /* Similar cu alte carduri */
+    color: var(--color-text);
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    margin: 40px auto; /* Adauga spatiu deasupra/dedesubt */
+    width: 90%;
+    max-width: 800px; /* Poti ajusta latimea */
+    text-align: left;
+}
+
+#news-section h2 {
+    text-align: center;
+    color: var(--color-text-forecast);
+    margin-top: 0;
+    margin-bottom: 25px;
+    border-bottom: 1px solid var(--color-border);
+    padding-bottom: 10px;
+}
+
+#news-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+#news-list li {
+    margin-bottom: 15px;
+    padding-bottom: 15px;
+    border-bottom: 1px dashed var(--color-border); /* Separator intre stiri */
+}
+ #news-list li:last-child {
+     border-bottom: none; /* Nu vrem separator la ultima stire */
+     margin-bottom: 0;
+     padding-bottom: 0;
+ }
+
+
+#news-list a {
+    color: var(--color-secondary); /* Link-uri vizibile */
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 1.1rem;
+}
+
+#news-list a:hover {
+    text-decoration: underline;
+}
+ #news-list p { /* Paragraful sursei */
+     font-size: 0.9rem;
+     color: var(--color-subtext);
+     margin-top: 5px;
+     margin-bottom: 0;
+ }
+  /* Atribuirea obligatorie pentru NewsAPI */
+ #news-attribution {
+     text-align: center;
+     font-size: 0.8rem;
+     margin-top: 20px;
+     color: var(--color-subtext);
+ }
+  #news-attribution a {
+     font-size: 0.8rem;
+     color: var(--color-secondary);
+ }

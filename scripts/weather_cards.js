@@ -2,7 +2,7 @@ document.addEventListener("DOMContentLoaded", (_event) => {
     const apiKey = '1ed72901fef34a7da48182141250901';
     
     const cityLists = {
-    night: ['Tokyo', 'Sydney', 'Beijing', 'Honolulu', 'Auckland'], // Orase probabil noaptea cand e zi in Europa
+    night: ['Tokyo', 'Sydney', 'Londra', 'New York', 'Los Angeles'], // Orase probabil noaptea cand e zi in Europa
     rain: ['Mawsynram', 'Cherrapunji', 'Tutunendo', 'San Antonio de Ureca', 'London'],   // Orase cunoscute pentru ploaie
     snow: ['Sapporo', 'Aomori', 'Quebec City', 'Anchorage', 'Murmansk'], // Orase nordice/reci
     storm: ['Tampa', 'Miami', 'Fort Myers', 'New Orleans', 'Mumbai'], // Orase tropicale/predispuse la furtuni
@@ -28,21 +28,29 @@ document.addEventListener("DOMContentLoaded", (_event) => {
         console.log(`Searching for a city with weather type: ${type}`);
         let foundCityData = null; // Variabila pentru a stoca datele orasului gasit
 
+        // --- SELECTAM FUNCTIA DE VERIFICARE CORECTA ---
+        let checkFunction;
+        switch (type) {
+            case 'night': checkFunction = isConditionNight; break;
+            case 'rain':  checkFunction = isConditionRain;  break;
+            case 'snow':  checkFunction = isConditionSnow;  break;
+            case 'storm': checkFunction = isConditionStorm; break;
+            case 'sunny': checkFunction = isConditionSunny; break;
+            default:      checkFunction = () => false; // Functie default care returneaza false
+        }
         // Itereaza prin lista de orase specifica tipului curent
         for (const city of cityLists[type]) {
             try {
                 const weatherData = await fetchWeather(city); // Cere vremea pentru oras
-                const determinedClass = determineWeatherClass({
-                    condition: weatherData?.current?.condition,
-                    localtime: weatherData?.location?.localtime,
-                });
+                if (!weatherData) continue; // Sari daca fetch esueaza
 
-                if (determinedClass === type) {
-                    console.log(`Found matching city for ${type}: ${city}`);
-                    foundCityData = weatherData; // Am gasit un oras potrivit
-                    break; // Opreste cautarea pentru acest tip de vreme
+                // --- FOLOSIM FUNCTIA SPECIFICA SELECTATA ---
+                if (checkFunction(weatherData)) {
+                    console.log(`Found matching city for SPECIFIC type ${type}: ${city}`);
+                    foundCityData = weatherData;
+                    break; // Am gasit, iesim
                 } else {
-                    console.log(`City ${city} does not match type ${type}. Trying next...`);
+                    console.log(`City ${city} (condition: ${weatherData.current?.condition?.text}, time: ${weatherData.location?.localtime}) does not match SPECIFIC type ${type}. Trying next...`);
                 }
             } catch (error) {
                 console.error(`Error fetching weather for ${city}:`, error);
@@ -81,42 +89,41 @@ document.addEventListener("DOMContentLoaded", (_event) => {
             });
     }
 
-    function determineWeatherClass(weatherData) {
-        if (!weatherData || !weatherData.condition || !weatherData.condition.text) return '';
+    function isConditionNight(weatherData) {
+        if (!weatherData?.location?.localtime) return false;
+        try {
+            const timePart = weatherData.location.localtime.split(' ')[1];
+            const hour = parseInt(timePart.split(':')[0], 10);
+            return hour >= 18 || hour < 6;
+        } catch (e) { return false; }
+    }
 
-        const conditionText = weatherData.condition.text.toLowerCase();
-        const timeString = weatherData.localtime || weatherData.last_updated;
-        let hour = -1;
-        if (timeString) {
-            try {
-                const timePart = timeString.split(' ')[1];
-                hour = timePart ? parseInt(timePart.split(':')[0], 10) : new Date(timeString).getHours();
-            } catch(e) { console.error("Could not parse time:", timeString); }
-        }
-        console.log('Determining class - Hour:', hour, 'Condition:', conditionText);
+    function isConditionRain(weatherData) {
+        if (!weatherData?.current?.condition?.text) return false;
+        const conditionText = weatherData.current.condition.text.toLowerCase();
+        // Cautam specific ploaie/burnita, NU si nori/ceata aici
+        return conditionText.includes('rain') || conditionText.includes('drizzle');
+    }
 
-        // Ninsoare
-        if (conditionText.includes('snow') || conditionText.includes('sleet') || conditionText.includes('ice pellets')) {
-            return 'snow';
-        }
-        // Furtuna
-        if (conditionText.includes('thunder') || conditionText.includes('storm') || conditionText.includes('heavy rain') || conditionText.includes('torrential rain')) {
-            return 'storm';
-        }
-        // Ploaie
-        if (conditionText.includes('rain') || conditionText.includes('drizzle') || conditionText.includes('cloudy') || conditionText.includes('overcast') || conditionText.includes('mist') || conditionText.includes('fog')) {
-            return 'rain';
-        }
-        // Noapte
-        if (hour !== -1 && (hour >= 18 || hour < 6)) {
-            return 'night';
-        }
-        // Soare
-        if (conditionText.includes('sunny') || conditionText.includes('clear') || conditionText.includes('partly cloudy')) {
-            return 'sunny';
-        }
-        // 6. Default: Nimic
-        return '';
+    function isConditionSnow(weatherData) {
+        if (!weatherData?.current?.condition?.text) return false;
+        const conditionText = weatherData.current.condition.text.toLowerCase();
+        return conditionText.includes('snow') || conditionText.includes('sleet') || conditionText.includes('ice pellets') || conditionText.includes('blizzard');
+    }
+
+    function isConditionStorm(weatherData) {
+        if (!weatherData?.current?.condition?.text) return false;
+        const conditionText = weatherData.current.condition.text.toLowerCase();
+        return conditionText.includes('thunder') || conditionText.includes('storm') || conditionText.includes('heavy rain') || conditionText.includes('torrential rain');
+    }
+
+    function isConditionSunny(weatherData) {
+        if (!weatherData?.current?.condition?.text || !weatherData?.location?.localtime) return false;
+        const conditionText = weatherData.current.condition.text.toLowerCase();
+        // Verificam daca e ZI inainte
+        if (isConditionNight(weatherData)) return false; // Nu e soare noaptea
+        return conditionText.includes('sunny') || conditionText.includes('clear');
+        // Am scos 'partly cloudy' de aici pentru a fi mai specific
     }
 
     // Functie generica pentru a actualiza continutul unui card.

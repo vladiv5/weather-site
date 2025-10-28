@@ -15,7 +15,7 @@ document.addEventListener("DOMContentLoaded", () => {
         // --- LISTA ÎMBUNĂTĂȚITĂ DE CUVINTE CHEIE METEO ---
         // Folosim ghilimele pentru expresii exacte și combinăm cu OR
         // Excludem termeni generali care pot fi ambigui (ex: doar 'storm' poate fi despre politică)
-        const weatherKeywords = [
+        /*const weatherKeywords = [
             '"weather forecast"', // Expresie exactă
             'climate',
             'temperature record', // Mai specific
@@ -31,20 +31,15 @@ document.addEventListener("DOMContentLoaded", () => {
             'drought',
             '"air quality"' // Expresie exactă
         ].join(' OR '); // Le combinăm cu OR
-        // --- SFÂRȘIT LISTĂ CUVINTE CHEIE ---
+        // --- SFÂRȘIT LISTĂ CUVINTE CHEIE ---*/
 
         if (favorites.length > 0) {
-            // Construim query pentru orașe favorite: (Oraș1 OR Oraș2 OR ...)
-            // Folosim ghilimele pentru a trata corect orașele cu spații (ex: "New York")
+            // Construim query DOAR cu orașele favorite: ("Oraș1" OR "Oraș2" ...)
             // Extragem doar numele orașului (partea dinainte de virgulă)
-            const cityQuery = favorites
+            query = favorites
                 .map(city => `"${city.split(',')[0].trim()}"`) 
                 .join(' OR ');
-
-            // Combinăm orașele ȘI cuvintele cheie meteo: (Orașe) AND (Cuvinte Meteo)
-            query = `(${cityQuery}) AND (${weatherKeywords})`;
             console.log("News query based on favorites AND weather keywords:", query);
-
         } else {
             // Fallback la știri generale despre vreme dacă nu există favorite
             // Folosim doar cuvintele cheie meteo
@@ -63,8 +58,8 @@ document.addEventListener("DOMContentLoaded", () => {
         const dateFrom = new Date();
         dateFrom.setDate(dateTo.getDate() - 30);
 
-        const domainsToSearch = 'bbc.co.uk,cnn.com,reuters.com,theguardian.com,weather.com';
-        const url = `https://newsapi.org/v2/everything?q=${encodeURIComponent(generalQuery)}&language=en&sortBy=relevancy&pageSize=5&domains=${domainsToSearch}&apiKey=${NEWS_API_KEY}`;
+        const domainsToSearch = 'weather.com,wunderground.com,accuweather.com,global.weathernews.com';
+        const url = `https://newsapi.org/v2/everything?q=${encodeURIComponent(query)}&language=en&sortBy=relevancy&pageSize=5&domains=${domainsToSearch}&apiKey=${NEWS_API_KEY}`;
         console.log("Fetching News URL:", url);
 
         if (newsListElement) {
@@ -115,7 +110,7 @@ document.addEventListener("DOMContentLoaded", () => {
      */
     async function fetchGeneralWeatherNews() {
          const generalQuery = '"weather forecast" OR climate OR storm OR temperature OR rain OR snow OR heatwave OR coldwave';
-         const domainsToSearch = 'bbc.co.uk,cnn.com,reuters.com,theguardian.com,weather.com';
+         const domainsToSearch = 'weather.com,wunderground.com,accuweather.com,global.weathernews.com';
          const url = `https://newsapi.org/v2/everything?q=${encodeURIComponent(generalQuery)}&language=en&sortBy=relevancy&pageSize=5&domains=${domainsToSearch}&apiKey=${NEWS_API_KEY}`;
          console.log("Fetching General News URL:", url);
 

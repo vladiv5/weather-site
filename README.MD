@@ -1,36 +1,96 @@
-[![Review Assignment Due Date](https://classroom.github.com/assets/deadline-readme-button-22041afd0340ce965d47ae6ef1cefeee28c7c493a6346c4f15d667ab976d596c.svg)](https://classroom.github.com/a/kg-1WmpK)
-# Weather viewer application
+# Weather Viewer Application
 
-## Story
+## Description
 
-People Always Talk About The Weather...
+This project is a modern, responsive weather dashboard built using vanilla JavaScript, HTML5, and CSS3. The application was designed to demonstrate proficiency in asynchronous programming, DOM manipulation, and third-party API integration, without relying on frontend frameworks.
 
-They are also always checking the weather in native and web applications.
+Users can view real-time weather conditions, access detailed 5-day forecasts with visual charts, read curated weather-related news, and manage a persistent list of favorite cities using browser local storage.
 
-Now you can go further and create your own web based Weather application!
+---
 
-This application should allow you, as a user to enter a city name (and be gently helped by an autocomplete in selecting it), and see the specific weather in that city. 
-It should have a pleasing UI/UX, that blends in an photo from the city with the rest of the application.
+## Features & Implementation
 
-## What are you going to learn?
+- **Real-Time Weather Data**
+  - Integrated the WeatherAPI to retrieve current conditions and multi-day forecasts.
+  - Implemented robust error handling using try/catch to gracefully manage invalid input and network failures.
 
-- Create a GET requests
-- Getting data from an API
-- Working with JSON 
+- **Dynamic Visual Experience**
+  - Integrated the Pexels API to dynamically load high-quality background images based on the selected city, improving user engagement.
 
-## General requirements
+- **Data Visualization**
+  - Used Chart.js to render interactive line charts for temperature trends and bar charts for precipitation probability across forecast days.
 
-- There is a `<div id="root">` tag without children when the page loads in
-- All the contents are placed and removed by javascript
+- **Favorites Management**
+  - Implemented a persistent favorites system using the browser Local Storage API.
+  - Saved cities are displayed in a dashboard-style grid with live weather updates and persist across page reloads.
 
-## Hints
+- **Geolocation Support**
+  - Utilized the native Geolocation API to fetch weather data based on the user’s current coordinates with a single action.
 
-- **For students that want to play around with frameworks, this project can also be implemented using a frontend framework like React, Vue, Svelte, htmx, etc. JQuery however is not an accepted.**
+- **Context-Aware Weather News**
+  - Integrated NewsAPI to display relevant weather-related news.
+  - Prioritized articles related to favorite cities, with a fallback to general weather headlines when no favorites are available.
 
-## Background materials
-- <i class="far fa-exclamation"></i> [JavaScript First steps](https://developer.mozilla.org/en-US/docs/Learn/JavaScript/First_steps)
-- <i class="far fa-exclamation"></i> [JavaScript Fetch API](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch)
-- <i class="far fa-exclamation"></i> [JavaScript Fetch API Examples](https://scotch.io/tutorials/how-to-use-the-javascript-fetch-api-to-get-data)
-- <i class="far fa-exclamation"></i> Weather APIs: [1](https://www.weatherapi.com/docs/), [2](https://openweathermap.org/api), [3](https://open-meteo.com/), and may other more
-- <i class="far fa-exclamation"></i> [Example autocomplete](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/datalist)
-- <i class="far fa-book-open"></i> [CSS Weather Widgets you can draw inspiration from - Do NOT copy and paste one, create your own!](https://freefrontend.com/css-weather-widgets/)
+---
+
+## Application Flow
+
+1. **Initialization**
+   - On load, the application checks Local Storage for existing favorite cities.
+   - The homepage is populated with predefined global cities to validate responsiveness and API availability.
+
+2. **User Interaction**
+   - Users search for a city manually or request location-based weather data via geolocation.
+
+3. **Asynchronous Data Fetching**
+   - Parallel API requests are performed (using `Promise.all` where applicable) to fetch weather data and background imagery.
+   - A loading spinner provides visual feedback during data retrieval.
+
+4. **Dynamic Rendering**
+   - Weather data is rendered dynamically into the DOM.
+   - Forecast charts are generated or updated when navigating to the detailed city view.
+
+5. **Persistence**
+   - Favorite cities are serialized and stored in Local Storage, ensuring data persistence across sessions.
+
+---
+
+## Project Structure
+
+Weather-Viewer/
+│
+├── index.html                # Homepage (Dashboard & News)
+├── city_weather.html         # Detailed forecast view
+├── favorites.html            # Favorites grid view
+├── about.html                # Project information
+│
+├── styles/
+│   ├── global.css            # Global variables and CSS reset
+│   ├── weather_cards.css     # Dashboard card styling
+│   ├── spinner.css           # Loading indicator
+│   └── ...
+│
+└── scripts/
+    ├── index.js              # Homepage logic and News API integration
+    ├── city_weather.js       # Forecast logic and chart rendering
+    ├── favorites.js          # Local Storage management
+    ├── global_search.js      # Shared search bar and geolocation logic
+    └── weather_cards.js      # Dashboard card rendering logic
+
+---
+
+## Build & Run
+
+This is a static web application and does not require a build step or backend server.
+
+### How to run:
+1. Clone the repository.
+2. Open `index.html` in any modern web browser.
+
+---
+
+## Notes
+
+- **Architecture**: A multi-page architecture was chosen to maintain semantic HTML structure and modular JavaScript logic.
+- **Responsiveness**: The UI is fully responsive, implemented using CSS Grid and Flexbox for compatibility across mobile, tablet, and desktop devices.
+- **API Key Handling**: API keys are included client-side for demonstration purposes. In a production environment, requests would be proxied through a backend service to secure sensitive credentials.

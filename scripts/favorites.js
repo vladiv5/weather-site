@@ -1,44 +1,43 @@
 document.addEventListener("DOMContentLoaded", () => {
     
-    // --- Referinte API si DOM ---
-    const apiKey = '1ed72901fef34a7da48182141250901'; // Cheia ta API
+    // --- API and DOM References ---
+    const apiKey = '1ed72901fef34a7da48182141250901';
     const favoritesGrid = document.getElementById("favorites-grid");
     const emptyMsg = document.getElementById("empty-favorites-msg");
     const toast = document.getElementById("toast-notification");
 
     let toastTimer;
 
-    // --- Functii ---
+    // --- Functions ---
 
     /**
-     * Incarca orasele favorite din localStorage si le afiseaza
+     * I load favorite cities from LocalStorage and display them.
      */
     async function loadFavorites() {
         showSpinner();
+        // I parse the favorites array, defaulting to empty if not found.
         const favorites = JSON.parse(localStorage.getItem("favorites")) || [];
 
         if (favorites.length === 0) {
-            // Afiseaza mesajul "lista goala"
+            // I show a user-friendly message if the list is empty.
             emptyMsg.classList.remove("hidden");
             hideSpinner();
             return;
         }
 
-        // Avem favorite, ascundem mesajul
         emptyMsg.classList.add("hidden");
 
-        // Cream o lista de "promisiuni" API
-        // Apelam API-ul pentru TOATE orasele in paralel
+        // I create an array of promises to fetch weather data for ALL cities in parallel.
+        // This is much faster than fetching them sequentially.
         const weatherPromises = favorites.map(city => fetchWeather(city));
 
         try {
-            // Asteptam ca TOATE apelurile sa se termine
+            // I wait for all API calls to complete.
             const weatherDataList = await Promise.all(weatherPromises);
 
-            // Curatam grila inainte de a adauga elemente noi
+            // I clear the grid before rendering fresh data.
             favoritesGrid.innerHTML = ""; 
             
-            // Cream si adaugam cardurile
             weatherDataList.forEach((data, index) => {
                 const originalCityName = favorites[index];
 
@@ -56,7 +55,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     /**
-     * Face un apel API pentru un singur oras
+     * I fetch current weather data for a single city.
      */
     function fetchWeather(city) {
         const url = `https://api.weatherapi.com/v1/current.json?key=${apiKey}&q=${city}`;
@@ -69,14 +68,14 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     /**
-     * Construieste HTML-ul pentru un singur card
+     * I generate the HTML for a single favorite card.
      */
-    function createFavoriteCard(data, originalCityName) { // <-- Argument nou
-        // Folosim datele din API pentru afisare
+    function createFavoriteCard(data, originalCityName) { 
+        // I destructure the API response for cleaner code.
         const { name, country } = data.location;
         const { temp_c, condition, wind_mph, humidity } = data.current;
 
-        // Folosim "originalCityName" (din localStorage) pentru data-atribute
+        // I store 'originalCityName' in a data attribute to use it later for deletion.
         return `
             <li class="grid-item favorite-card" data-city="${originalCityName}">
                 <div class="status">
@@ -93,11 +92,11 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     /**
-     * Adauga event listeners (delegare) pentru butoanele de stergere
+     * I use event delegation to handle clicks on remove buttons efficiently.
      */
     function setupRemoveButtons() {
         favoritesGrid.addEventListener('click', (e) => {
-            // Verificam daca s-a dat click pe un buton de stergere
+            // I check if the clicked element is a remove button.
             if (e.target.classList.contains('remove-fav-card')) {
                 const city = e.target.dataset.city;
                 removeFavorite(city);
@@ -106,99 +105,85 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     /**
-     * Sterge un oras din localStorage si de pe pagina
+     * I remove a city from both LocalStorage and the DOM.
      */
     function removeFavorite(city) {
         let favorites = JSON.parse(localStorage.getItem("favorites")) || [];
         const updatedFavorites = favorites.filter(fav => fav !== city);
         
-        // Salvam lista noua in localStorage
+        // I update LocalStorage.
         localStorage.setItem("favorites", JSON.stringify(updatedFavorites));
         
-        // Stergem cardul de pe pagina (fara refresh)
+        // I remove the DOM element immediately without reloading the page.
         const cardToRemove = document.querySelector(`.favorite-card[data-city="${city}"]`);
         if (cardToRemove) {
             cardToRemove.remove();
         }
 
-        // Afiseaza notificarea de stergere
         showToast(`Removed ${city} from favorites.`);
 
-        // Anunta restul aplicatiei (in special global_search.js)
+        // I dispatch a custom event to notify other parts of the app (like search bar state).
         const event = new CustomEvent('favoriteRemoved', { detail: { city: city } });
         document.dispatchEvent(event);
 
-        // Daca am sters ultimul card, afisam mesajul "lista goala"
         if (favorites.length === 0) {
             emptyMsg.classList.remove("hidden");
         }
     }
 
     /**
- * Functie NOUA: Adauga un singur card nou in grila,
- * apelata de evenimentul 'favoriteAdded'
- */
-async function appendNewFavoriteCard(city) {
-    try {
-        // 1. Cere datele meteo pentru noul oras
-        const data = await fetchWeather(city);
+     * I dynamically append a new card when the user adds a favorite from the search bar.
+     */
+    async function appendNewFavoriteCard(city) {
+        try {
+            const data = await fetchWeather(city);
 
-        if (data && data.location) {
-            // 2. Creaza HTML-ul cardului
-            // Folosim 'city' (numele original) pentru stergere
-            const cardHTML = createFavoriteCard(data, city);
+            if (data && data.location) {
+                const cardHTML = createFavoriteCard(data, city);
 
-            // 3. Ascunde mesajul "lista goala", daca e vizibil
-            emptyMsg.classList.add("hidden");
+                emptyMsg.classList.add("hidden");
 
-            // 4. Adauga noul card in grila
-            // 'insertAdjacentHTML' e mai eficient decat 'innerHTML +='
-            favoritesGrid.insertAdjacentHTML('beforeend', cardHTML);
+                // I insert the new HTML at the end of the grid.
+                favoritesGrid.insertAdjacentHTML('beforeend', cardHTML);
+            }
+        } catch (error) {
+            console.error("Failed to append new favorite card:", error);
+        } finally {
+
         }
-    } catch (error) {
-        console.error("Failed to append new favorite card:", error);
-        // Nu afisam toast, 'global_search' a facut-o deja
-    } finally {
-
     }
-}
 
     function showToast(message) {
-        if (!toast) return; // Daca elementul toast nu exista
+        if (!toast) return;
 
-        clearTimeout(toastTimer); // Reseteaza timer-ul daca exista unul activ
+        clearTimeout(toastTimer);
         
         toast.textContent = message;
-        toast.classList.remove("hidden"); // Asigurare
+        toast.classList.remove("hidden");
         toast.classList.remove("show");
 
-        // Pasul 2: Folosim un timeout mic (sau requestAnimationFrame)
-        // pentru a lasa browser-ul sa aplice pasul 1 inainte de a porni animatia
+        // I use a small timeout to allow the browser to register the state change before animating.
         setTimeout(() => {
-            toast.classList.add("show"); // Adauga clasa care declanseaza animatia
-        }, 10); // Un delay foarte mic, de obicei suficient
-        // ------------------
+            toast.classList.add("show");
+        }, 10); 
 
-        // Ascunde pop-up-ul dupa 3 secunde
         toastTimer = setTimeout(() => {
             toast.classList.remove("show");
-            // Adaugam un mic delay pt tranzitia de "fade-out"
             setTimeout(() => {
                 toast.classList.add("hidden");
-            }, 300); // Trebuie sa fie la fel ca tranzitia CSS
+            }, 300); // Matches CSS transition duration.
         }, 3000);
     }
 
     /**
- * Asculta evenimentul global 'favoriteAdded' trimis de
- * global_search.js si adauga noul card pe pagina.
- */
-document.addEventListener('favoriteAdded', (e) => {
-    const newCity = e.detail.city;
-    appendNewFavoriteCard(newCity);
-});
+     * I listen for the 'favoriteAdded' event triggered by the global search component.
+     */
+    document.addEventListener('favoriteAdded', (e) => {
+        const newCity = e.detail.city;
+        appendNewFavoriteCard(newCity);
+    });
 
-    // --- Initializare ---
+    // --- Initialization ---
     setupRemoveButtons();
     loadFavorites();
 });

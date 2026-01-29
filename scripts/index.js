@@ -1,27 +1,25 @@
 document.addEventListener("DOMContentLoaded", () => {
     const newsListElement = document.getElementById("news-list");
     const newsSection = document.getElementById("news-section");
-    const NEWS_API_KEY = '550ef056a2894c828b23995e1fce8cf1'; // !!! Înlocuiește cu cheia ta reală !!!
+    const NEWS_API_KEY = '550ef056a2894c828b23995e1fce8cf1'; 
 
     /**
-     * Construiește query-ul pentru NewsAPI.
-     * Prioritizează știrile din orașele favorite.
-     * @returns {string} Query-ul final pentru API.
+     * I build a dynamic search query for the NewsAPI.
+     * I prioritize news related to the user's favorite cities if any exist.
      */
     function buildNewsQuery() {
+        // I retrieve the favorites from local storage.
         const favorites = JSON.parse(localStorage.getItem("favorites")) || [];
         let query = '';
 
-        // --- LISTA ÎMBUNĂTĂȚITĂ DE CUVINTE CHEIE METEO ---
-        // Folosim ghilimele pentru expresii exacte și combinăm cu OR
-        // Excludem termeni generali care pot fi ambigui (ex: doar 'storm' poate fi despre politică)
-        /*const weatherKeywords = [
-            '"weather forecast"', // Expresie exactă
+        // I define fallback keywords for general weather news if the user has no favorites.
+        const weatherKeywords = [
+            '"weather forecast"', 
             'climate',
-            'temperature record', // Mai specific
+            'temperature record', 
             'precipitation',
-            'rainfall', // Mai specific
-            'snowfall', // Mai specific
+            'rainfall', 
+            'snowfall', 
             'blizzard',
             'hurricane',
             'typhoon',
@@ -29,20 +27,18 @@ document.addEventListener("DOMContentLoaded", () => {
             'heatwave',
             'cold snap',
             'drought',
-            '"air quality"' // Expresie exactă
-        ].join(' OR '); // Le combinăm cu OR
-        // --- SFÂRȘIT LISTĂ CUVINTE CHEIE ---*/
+            '"air quality"' 
+        ].join(' OR ');
 
         if (favorites.length > 0) {
-            // Construim query DOAR cu orașele favorite: ("Oraș1" OR "Oraș2" ...)
-            // Extragem doar numele orașului (partea dinainte de virgulă)
+            // I construct a query specifically for the favorite cities.
+            // I sanitize the city name by taking only the part before the comma (e.g., "London, UK" -> "London").
             query = favorites
                 .map(city => `"${city.split(',')[0].trim()}"`) 
                 .join(' OR ');
             console.log("News query based on favorites AND weather keywords:", query);
         } else {
-            // Fallback la știri generale despre vreme dacă nu există favorite
-            // Folosim doar cuvintele cheie meteo
+            // I fallback to general weather keywords.
             query = weatherKeywords;
             console.log("News query (general weather keywords only):", query);
         }
@@ -50,20 +46,22 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     /**
-     * Preia știrile despre vreme de la NewsAPI folosind query-ul construit.
+     * I fetch weather-related news articles from the external API.
      */
     async function fetchWeatherNews() {
         const query = buildNewsQuery();
+        // I set the date range to fetch articles from the last 30 days.
         const dateTo = new Date();
         const dateFrom = new Date();
         dateFrom.setDate(dateTo.getDate() - 30);
 
+        // I restrict the search to trusted domains to ensure content relevance.
         const domainsToSearch = 'weather.com,wunderground.com,accuweather.com,global.weathernews.com';
         const url = `https://newsapi.org/v2/everything?q=${encodeURIComponent(query)}&language=en&sortBy=relevancy&pageSize=5&domains=${domainsToSearch}&apiKey=${NEWS_API_KEY}`;
         console.log("Fetching News URL:", url);
 
         if (newsListElement) {
-            newsListElement.innerHTML = "<li>Loading news...</li>"; // Mesaj de încărcare
+            newsListElement.innerHTML = "<li>Loading news...</li>"; 
         }
 
         try {
@@ -75,19 +73,18 @@ document.addEventListener("DOMContentLoaded", () => {
             const data = await response.json();
 
             if (data.status === "ok") {
-                // Dacă avem favorite ȘI am primit rezultate, le afișăm
+                // I check if we found specific news for the favorite cities.
                 const favorites = JSON.parse(localStorage.getItem("favorites")) || [];
                 if (favorites.length > 0 && data.articles && data.articles.length > 0) {
                     console.log(`Found ${data.articles.length} news articles related to favorites.`);
                     displayWeatherNews(data.articles);
                 }
-                // Dacă NU avem favorite SAU query-ul pentru favorite nu a returnat nimic,
-                // încercăm un query general.
+                // If no specific news was found (or favorites list is empty), I fallback to general news.
                 else if (!favorites.length || (data.articles && data.articles.length === 0)) {
                     console.log("No favorites or no news found for favorites. Fetching general weather news...");
-                    await fetchGeneralWeatherNews(); // Apelăm funcția de fallback
+                    await fetchGeneralWeatherNews(); 
                 }
-                 else { // Caz neașteptat (ex: data.articles e undefined)
+                 else { 
                     throw new Error("Invalid response structure from NewsAPI.");
                 }
 
@@ -100,13 +97,12 @@ document.addEventListener("DOMContentLoaded", () => {
             if (newsListElement) {
                 newsListElement.innerHTML = "<li>Could not load weather news at this time.</li>";
             }
-            addNewsApiAttribution(); // Adăugăm atribuirea chiar și la eroare
+            addNewsApiAttribution(); 
         }
     }
 
     /**
-     * Funcție de Fallback: Preia știri generale despre vreme dacă nu există favorite
-     * sau dacă nu s-au găsit știri specifice favoritelor.
+     * Fallback function to fetch general weather news if specific city queries fail.
      */
     async function fetchGeneralWeatherNews() {
          const generalQuery = '"weather forecast" OR climate OR storm OR temperature OR rain OR snow OR heatwave OR coldwave';
@@ -124,9 +120,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
              if (data.status === "ok" && data.articles) {
                   console.log(`Found ${data.articles.length} general weather news articles.`);
-                 displayWeatherNews(data.articles);
+                  displayWeatherNews(data.articles);
              } else {
-                 throw new Error(data.message || "Could not fetch general news.");
+                  throw new Error(data.message || "Could not fetch general news.");
              }
          } catch(error) {
               console.error("Error fetching general weather news:", error);
@@ -139,34 +135,33 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
     /**
-     * Afișează știrile în lista UL
+     * I render the news articles into the DOM.
      */
     function displayWeatherNews(articles) {
         if (!newsListElement) return;
 
         if (!articles || articles.length === 0) {
             newsListElement.innerHTML = "<li>No relevant weather news found recently.</li>";
-             addNewsApiAttribution(); // Adaugam atribuirea si aici
+             addNewsApiAttribution(); 
             return;
         }
 
-        newsListElement.innerHTML = ""; // Golim mesajul "Loading..."
+        newsListElement.innerHTML = ""; 
 
         articles.forEach(article => {
-            // Verificare simplă dacă titlul conține termeni irelevanți comuni (poate fi îmbunătățită)
+            // I filter out articles with titles containing irrelevant keywords (like stocks or markets).
             const titleLower = article.title.toLowerCase();
             if (titleLower.includes("stock") || titleLower.includes("market") || titleLower.includes("politics")) {
                  console.log("Skipping potentially irrelevant article:", article.title);
-                 return; // Sari peste articole probabil irelevante
+                 return; 
             }
-
 
             const listItem = document.createElement("li");
             const link = document.createElement("a");
             link.href = article.url;
             link.textContent = article.title;
             link.target = "_blank";
-            link.rel = "noopener noreferrer";
+            link.rel = "noopener noreferrer"; // Security best practice for external links.
 
             const source = document.createElement("p");
             source.textContent = `Source: ${article.source.name || 'Unknown'}`;
@@ -180,7 +175,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     /**
-     * Adaugă link-ul de atribuire pentru NewsAPI.org
+     * I append the required attribution link for NewsAPI.org.
      */
     function addNewsApiAttribution() {
         if (!newsSection || document.getElementById('news-attribution')) return;
@@ -191,6 +186,6 @@ document.addEventListener("DOMContentLoaded", () => {
         newsSection.appendChild(attribution);
     }
 
-    // --- Inițializare ---
-    fetchWeatherNews(); // Apelăm funcția principală la încărcarea paginii
+    // I start the news fetching process when the script loads.
+    fetchWeatherNews(); 
 });

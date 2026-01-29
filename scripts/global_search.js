@@ -1,21 +1,23 @@
 document.addEventListener("DOMContentLoaded", () => {
-    // --- Elemente DOM & Constante ---
+    // --- DOM Elements & Constants ---
     const autocomplete = document.getElementById("autocomplete");
     const resultsList = document.getElementById("results");
     const toast = document.getElementById("toast-notification");
     const getLocationBtn = document.getElementById("get-location-btn");
 
-    const API_KEY = "1ed72901fef34a7da48182141250901"; // Cheia ta
+    const API_KEY = "1ed72901fef34a7da48182141250901"; 
+    // I initialize the internal favorites cache from LocalStorage.
     let favorites = JSON.parse(localStorage.getItem("favorites")) || [];
     let toastTimer;
 
-    // --- Event Listeners pentru Autocomplete ---
+    // --- Autocomplete Event Listeners ---
 
-    // Input handler
+    // I handle user input to fetch city suggestions.
     autocomplete.addEventListener("input", () => {
         const query = autocomplete.value.trim();
         resultsList.innerHTML = "";
 
+        // I only trigger a search if the user types more than 2 characters to save API calls.
         if (query.length > 2) {
             fetchCities(query);
             resultsList.classList.remove("hidden");
@@ -24,14 +26,14 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 
-    // Focus pe search bar
+    // I show results again if the user focuses back on the input.
     autocomplete.addEventListener("focus", () => {
         if (autocomplete.value.trim().length > 2 && resultsList.children.length > 0) {
             resultsList.classList.remove("hidden");
         }
     });
 
-    // Click in afara search bar-ului
+    // I hide the dropdown when clicking outside the search component.
     document.addEventListener("click", (event) => {
         const isClickInsideSearch =
             autocomplete.contains(event.target) || resultsList.contains(event.target);
@@ -41,30 +43,29 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     /**
-     * Asculta evenimentul global 'favoriteRemoved' trimis de
-     * favorites.js si actualizeaza lista interna 'favorites'.
+     * I listen for 'favoriteRemoved' to keep my internal cache in sync.
      */
     document.addEventListener('favoriteRemoved', (e) => {
         const removedCity = e.detail.city;
-        // Filtreaza lista interna 'favorites' pentru a elimina orasul
         favorites = favorites.filter(fav => fav !== removedCity);
-        console.log('Internal favorites updated after removal:', favorites); // Optional: pentru debugging
+        console.log('Internal favorites updated after removal:', favorites);
     });
 
+    // Geolocation handler
     getLocationBtn.addEventListener('click', () => {
-    if (navigator.geolocation) {
-        showSpinner(); // Afiseaza spinner cat timp asteptam
-        navigator.geolocation.getCurrentPosition(geolocationSuccess, geolocationError, {
-            enableHighAccuracy: true, // Incearca sa obtina o locatie mai precisa
-            timeout: 10000,         // Timp maxim de asteptare (10 secunde)
-            maximumAge: 0           // Forteaza obtinerea unei locatii proaspete
-        });
-    } else {
-        showToast("Geolocation is not supported by this browser.");
-    }
-});
+        if (navigator.geolocation) {
+            showSpinner(); 
+            navigator.geolocation.getCurrentPosition(geolocationSuccess, geolocationError, {
+                enableHighAccuracy: true,
+                timeout: 10000,         
+                maximumAge: 0           
+            });
+        } else {
+            showToast("Geolocation is not supported by this browser.");
+        }
+    });
 
-    // --- Functii API & Favorite ---
+    // --- API Functions ---
 
     async function fetchCities(query) {
         const url = `https://api.weatherapi.com/v1/search.json?key=${API_KEY}&q=${query}`;
@@ -81,22 +82,21 @@ document.addEventListener("DOMContentLoaded", () => {
             data.forEach(city => {
                 const li = document.createElement("li");
 
-                // --- Am sters stilurile inline, le-am mutat in CSS ---
-
                 const uniqueName = `${city.name}, ${city.country}`;
                 const span = document.createElement("span");
                 span.textContent = uniqueName;
 
+                // Navigation logic
                 li.addEventListener("click", () => {
                     window.location.href = `city_weather.html?city=${encodeURIComponent(city.name)}`;
                 });
 
-                // Butonul de adaugare la favorite
+                // Favorite button logic
                 const heart = document.createElement("button");
                 heart.className = "heart-button";
                 heart.innerHTML = "&#9829;";
                 heart.addEventListener("click", (e) => {
-                    e.stopPropagation(); // Opreste redirectarea
+                    e.stopPropagation(); // I prevent the click from triggering navigation.
                     addFavorite(uniqueName);
                 });
 
@@ -112,17 +112,15 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-    // --- MODIFICARE ---
-    // Functia adFavorite acum foloseste noul pop-up (toast)
     function addFavorite(city) {
+        // I prevent duplicates.
         if (!favorites.includes(city)) {
             favorites.push(city);
             localStorage.setItem("favorites", JSON.stringify(favorites));
 
-            // Afiseaza pop-up-ul
             showToast(`Added ${city} to favorites!`);
 
-            // Anunta restul aplicatiei (in special pagina de favorite)
+            // I broadcast an event so the Favorites page can update in real-time.
             const event = new CustomEvent('favoriteAdded', { detail: { city: city } });
             document.dispatchEvent(event);
 
@@ -131,47 +129,38 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-    // Functia pentru a afisa pop-up-ul
     function showToast(message) {
-        if (!toast) return; // Daca elementul toast nu exista
+        if (!toast) return;
 
-        clearTimeout(toastTimer); // Reseteaza timer-ul daca exista unul activ
+        clearTimeout(toastTimer);
 
         toast.textContent = message;
         toast.classList.add("show");
-        toast.classList.remove("hidden"); // Asigurare
+        toast.classList.remove("hidden");
 
-        // Ascunde pop-up-ul dupa 3 secunde
         toastTimer = setTimeout(() => {
             toast.classList.remove("show");
-            // Adaugam un mic delay pt tranzitia de "fade-out"
             setTimeout(() => {
                 toast.classList.add("hidden");
-            }, 300); // Trebuie sa fie la fel ca tranzitia CSS
+            }, 300);
         }, 3000);
     }
     
     /**
-     * Callback apelat cand geolocatia reuseste.
-     * Redirectioneaza catre pagina meteo folosind coordonatele.
+     * I handle successful geolocation by redirecting to the weather page with coordinates.
      */
     function geolocationSuccess(position) {
-        hideSpinner(); // Ascunde spinner-ul
+        hideSpinner(); 
         const lat = position.coords.latitude;
         const lon = position.coords.longitude;
 
-        // Formateaza coordonatele pentru API (lat,lon)
         const query = `${lat},${lon}`;
 
-        // Redirectioneaza catre pagina meteo
         window.location.href = `city_weather.html?city=${encodeURIComponent(query)}`;
     }
 
-    /**
-     * Callback apelat cand geolocatia esueaza sau este refuzata.
-     */
     function geolocationError(error) {
-        hideSpinner(); // Ascunde spinner-ul
+        hideSpinner();
         console.error("Geolocation error:", error);
         let message = "Could not get your location.";
         switch(error.code) {
@@ -188,8 +177,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 message = "An unknown error occurred while getting location.";
                 break;
         }
-        showToast(message); // Afiseaza eroarea utilizatorului
+        showToast(message);
     }
 
 });
-

@@ -56,7 +56,7 @@ Users can view real-time weather conditions, access detailed 5-day forecasts wit
 ---
 
 ## Project Structure
-
+```bash
 Weather-Viewer/
 │
 ├── index.html                # Homepage (Dashboard & News)
@@ -76,7 +76,7 @@ Weather-Viewer/
     ├── favorites.js          # Local Storage management
     ├── global_search.js      # Shared search bar and geolocation logic
     └── weather_cards.js      # Dashboard card rendering logic
-
+```
 ---
 
 ## Build & Run
@@ -94,3 +94,4 @@ This is a static web application and does not require a build step or backend se
 - **Architecture**: A multi-page architecture was chosen to maintain semantic HTML structure and modular JavaScript logic.
 - **Responsiveness**: The UI is fully responsive, implemented using CSS Grid and Flexbox for compatibility across mobile, tablet, and desktop devices.
 - **API Key Handling**: API keys are included client-side for demonstration purposes. In a production environment, requests would be proxied through a backend service to secure sensitive credentials.
+
